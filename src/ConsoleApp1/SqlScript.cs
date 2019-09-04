@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Threading;
@@ -38,6 +39,24 @@ namespace ConsoleApp1
                         command.CommandType = CommandType.Text;
                         await command.ExecuteNonQueryAsync(CancellationToken.None);
                     }
+                }
+            }
+        }
+
+        public static async Task ExecuteSqlReaderAsync(string script, string connectionString,
+            Func<SqlDataReader, Task> callback)
+        {
+            using (var connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+
+                using (var command = new SqlCommand())
+                {
+                    command.Connection = connection;
+                    command.CommandText = script;
+                    command.CommandType = CommandType.Text;
+                    using (var reader = await command.ExecuteReaderAsync(CancellationToken.None))
+                        await callback(reader);
                 }
             }
         }

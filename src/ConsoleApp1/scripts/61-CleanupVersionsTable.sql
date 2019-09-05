@@ -1,0 +1,14 @@
+﻿USE [SN7_Upgrade];
+GO
+
+BEGIN TRANSACTION;
+SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+SET XACT_ABORT ON;
+
+DROP TABLE [dbo].[Versions];
+EXECUTE sp_rename N'[dbo].[tmp_ms_xx_Versions]', N'Versions';
+EXECUTE sp_rename N'[dbo].[tmp_ms_xx_constraint_PK_Versions1]', N'PK_Versions', N'OBJECT';
+
+COMMIT TRANSACTION;
+SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
+GO

@@ -28,13 +28,13 @@ namespace ConsoleApp1
             ResetDatabase(scriptRoot, ConnectionString);
             Console.WriteLine("Ok.");
 
-            Console.WriteLine("Upgrade SN Schema...");
-            UpgradeSnSchema(scriptRoot, ConnectionString);
+            Console.WriteLine("Upgrade DB Schema...");
+            UpgradeDbPart1(scriptRoot, ConnectionString);
             Console.WriteLine("Ok.");
 
-            Console.WriteLine("Upgrade FlatProperties");
-            UpgradeFlatProperties(ConnectionString).ConfigureAwait(false).GetAwaiter().GetResult();
-            Console.WriteLine("Ok.");
+            //Console.WriteLine("Upgrade FlatProperties");
+            //UpgradeFlatProperties(ConnectionString).ConfigureAwait(false).GetAwaiter().GetResult();
+            //Console.WriteLine("Ok.");
 
             if (Debugger.IsAttached)
             {
@@ -51,18 +51,33 @@ namespace ConsoleApp1
                 "CreateDb\\01-Install_Security.sql",
                 "CreateDb\\02-Install_01_Schema.sql",
                 "CreateDb\\03-Install_02_Procs.sql",
-                "CreateDb\\04-CustomItems.sql",
                 "CreateDb\\05-InsertOldSchemaData.sql",
                 "CreateDb\\06-InsertFlatProperties.sql",
+                "CreateDb\\07-InsertTableData.sql",
             });
         }
 
-        private static void UpgradeSnSchema(string scriptRoot, string connectionString)
+        private static void UpgradeDbPart1(string scriptRoot, string connectionString)
         {
             ExecuteScripts(scriptRoot, connectionString, new[]
             {
-                "100-Create-new-SnSchema.sql",
-                "101-UpgradeSchema.sql",
+                "10-DropConstraintsIndexes.sql",
+                "20-CreateNewSnSchema.sql",
+                "21-UpgradeSchema.sql",
+                "30-CreateNewLongTextProperties.sql",
+                "31-UpgradeLongTextProperties.sql",
+                "40-DateTime2.sql",
+                "50-AlterViews.sql",
+                "60-RebuildVersionsTable.sql",
+            });
+        }
+        private static void UpgradeDbPart2(string scriptRoot, string connectionString)
+        {
+            ExecuteScripts(scriptRoot, connectionString, new[]
+            {
+                "61-CleanupVersionsTable.sql",
+                "90-ReCreateConstraintsIndexes.sql",
+                "91-DropOldItems.sql",
             });
         }
 

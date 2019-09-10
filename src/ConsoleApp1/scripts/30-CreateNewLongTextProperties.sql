@@ -9,6 +9,3 @@ CREATE TABLE [dbo].[LongTextProperties] (
     CONSTRAINT [PK_LongTextProperties] PRIMARY KEY CLUSTERED ([LongTextPropertyId] ASC)
 );
 GO
-CREATE NONCLUSTERED INDEX [ix_version_id]
-    ON [dbo].[LongTextProperties]([VersionId] ASC);
-GO

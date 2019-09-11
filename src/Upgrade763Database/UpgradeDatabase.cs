@@ -1,0 +1,325 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Data;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Threading;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+using SenseNet.Packaging;
+using SenseNet.Packaging.Steps;
+using SenseNet.Search;
+using SenseNet.Search.Indexing;
+using ExecutionContext = SenseNet.Packaging.ExecutionContext;
+
+namespace Upgrade763Database
+{
+    public class UpgradeDatabase : Step
+    {
+        public int Parallelism { get; set; }
+
+        public override void Execute(ExecutionContext context)
+        {
+            var connectionString = SenseNet.Configuration.ConnectionStrings.ConnectionString;
+            Logger.LogMessage("Connection: " + connectionString);
+
+            if (Parallelism == 0)
+                Parallelism = Environment.ProcessorCount;
+            Logger.LogMessage("Parallelism: " + Parallelism);
+
+            //UpgradeVersionDataAsync(connectionString).GetAwaiter().GetResult();
+            UpgradeVersionDataParallel(connectionString);
+        }
+
+
+        //private static async Task UpgradeVersionDataAsync(string connectionString)
+        //{
+        //    var mappings = await LoadFlatPropertyMappingsAsync(connectionString);
+        //    var versionIds = (await GetVersionIdsAsync(connectionString)).ToArray();
+        //    var maxCount = versionIds.Length;
+        //    var count = 0;
+        //    foreach (var versionId in versionIds)
+        //    {
+        //        var serializedIndexDoc = await TransformIndexDocumentAsync(versionId, connectionString);
+        //        await UpgradeVersionRecord(versionId, serializedIndexDoc, connectionString, mappings);
+        //        count++;
+        //        if (count % 100 == 0)
+        //            Logger.LogMessage("  {0}/{1}", count, maxCount);
+        //    }
+        //}
+        private void UpgradeVersionDataParallel(string connectionString)
+        {
+            var mappings = LoadFlatPropertyMappingsAsync(connectionString).GetAwaiter().GetResult();
+            var versionIds = GetVersionIdsAsync(connectionString).GetAwaiter().GetResult().ToArray();
+            var maxCount = versionIds.Length;
+            var count = 0;
+
+            var options = new ParallelOptions
+            {
+                MaxDegreeOfParallelism = Parallelism,
+            };
+            Parallel.ForEach(versionIds, options, versionId =>
+            {
+                var serializedIndexDoc =
+                    TransformIndexDocumentAsync(versionId, connectionString).GetAwaiter().GetResult();
+                UpgradeVersionRecord(versionId, serializedIndexDoc, connectionString, mappings).GetAwaiter().GetResult();
+                count++;
+                if (count % 100 == 0)
+                    Logger.LogMessage("  {0}/{1}", count, maxCount);
+            });
+        }
+
+        private async Task UpgradeVersionRecord(int versionId, string serializedIndexDoc, string connectionString,
+            Dictionary<int, Dictionary<string, string>> mappings)
+        {
+            var dynamicPropertyItems = new List<string>();
+            var contentListPropertyItems = new List<string>();
+
+            var script = "SELECT * FROM FlatProperties WHERE VersionId = " + versionId;
+            await SqlScript.ExecuteSqlReaderAsync(script, connectionString, async reader =>
+            {
+                while (await reader.ReadAsync(CancellationToken.None))
+                {
+                    var page = reader.GetInt32(2);
+
+                    for (var i = 3; i < reader.FieldCount; i++)
+                    {
+                        var value = reader.GetValue(i);
+                        if (value != DBNull.Value)
+                        {
+                            var column = reader.GetName(i);
+
+                            string stringValue = null;
+                            if (mappings[page].TryGetValue(column, out var propName))
+                            {
+                                if (column.StartsWith("nvarchar_"))
+                                    stringValue = (string)value;
+                                else if (column.StartsWith("int_"))
+                                    stringValue = value.ToString();
+                                else if (column.StartsWith("datetime_"))
+                                    stringValue = ((DateTime)value).ToString("yyyy-MM-dd HH:mm:ss.ffffff");
+                                else if (column.StartsWith("money_"))
+                                    stringValue = ((decimal)value).ToString(CultureInfo.InvariantCulture);
+                            }
+
+                            if (stringValue != null)
+                            {
+                                if (propName[0] == '#')
+                                    contentListPropertyItems.Add($"{propName}:{stringValue}");
+                                else
+                                    dynamicPropertyItems.Add($"{propName}:{stringValue}");
+                            }
+                        }
+                    }
+                }
+            });
+            var dynamicProperties = "\r\n" + string.Join("\r\n", dynamicPropertyItems.ToArray()) + "\r\n";
+            var contentListProperties = "\r\n" + string.Join("\r\n", contentListPropertyItems.ToArray()) + "\r\n";
+            var updateVersionScript =
+                "UPDATE tmp_ms_xx_Versions SET " +
+                "  DynamicProperties = @DProps, " +
+                "  ContentListProperties = @CProps, " +
+                "  IndexDocument = @IndxDoc " +
+                "WHERE VersionId = @VersionId";
+            await SqlScript.ExecuteSqlAsync(updateVersionScript, connectionString, cmd =>
+            {
+                cmd.Parameters.Add("@VersionId", SqlDbType.Int).Value = versionId;
+                cmd.Parameters.Add("@DProps", SqlDbType.NVarChar, -1).Value = dynamicProperties;
+                cmd.Parameters.Add("@CProps", SqlDbType.NVarChar, -1).Value = contentListProperties;
+                cmd.Parameters.Add("@IndxDoc", SqlDbType.NVarChar, -1).Value = serializedIndexDoc;
+            });
+        }
+
+        private async Task<Dictionary<int, Dictionary<string, string>>> LoadFlatPropertyMappingsAsync(
+            string connectionString)
+        {
+            var mappings = new Dictionary<int, Dictionary<string, string>>();
+
+            var sql = "SELECT [Name], [Page], [Column] FROM PropertyInfoView WHERE [Table] = 'Flat'";
+            await SqlScript.ExecuteSqlReaderAsync(sql, connectionString, async reader =>
+            {
+                while (await reader.ReadAsync(CancellationToken.None))
+                {
+                    var name = reader.GetString(0);
+                    var page = reader.GetInt32(1);
+                    var col = reader.GetString(2);
+                    if (!mappings.TryGetValue(page, out var mappingPage))
+                    {
+                        mappingPage = new Dictionary<string, string>();
+                        mappings.Add(page, mappingPage);
+                    }
+                    mappingPage.Add(col, name);
+                }
+            });
+
+            return mappings;
+        }
+        private async Task<IEnumerable<int>> GetVersionIdsAsync(string connectionString)
+        {
+            var result = new List<int>();
+
+            var sql = "SELECT VersionId FROM Versions";
+            await SqlScript.ExecuteSqlReaderAsync(sql, connectionString, async reader =>
+            {
+                while (await reader.ReadAsync(CancellationToken.None))
+                    result.Add(reader.GetInt32(0));
+            });
+
+            return result;
+        }
+
+        /* =============================================================================== INDEX DOCUMENT */
+
+        private async Task<string> TransformIndexDocumentAsync(int versionId, string connectionString)
+        {
+            var indexDocBytes = await LoadIndexDocAsync(versionId, connectionString);
+            if (indexDocBytes == null)
+                return null;
+
+            var deserialized = Deserialize(indexDocBytes);
+            var doc = new IndexDocument2();
+            foreach (var item in deserialized)
+                doc.Add(item);
+            var serialized = doc.Serialize();
+
+            return serialized;
+        }
+        private async Task<byte[]> LoadIndexDocAsync(int versionId, string connectionString)
+        {
+            var sql = "SELECT VersionId, IndexDocument FROM Versions WHERE VersionId = @VersionId";
+            byte[] indexDocBytes = null;
+            await SqlScript.ExecuteSqlReaderAsync(sql, connectionString, cmd =>
+            {
+                cmd.Parameters.Add("@VersionId", SqlDbType.Int).Value = versionId;
+            }, async reader =>
+            {
+                if (await reader.ReadAsync())
+                    indexDocBytes = reader.IsDBNull(1) ? null : (byte[])reader.GetValue(1);
+            });
+            return indexDocBytes;
+        }
+        private IndexDocument Deserialize(byte[] serializedIndexDocument)
+        {
+            var docStream = new MemoryStream(serializedIndexDocument);
+
+            var formatter = new BinaryFormatter();
+            var indxDoc = (IndexDocument)formatter.Deserialize(docStream);
+            return indxDoc;
+        }
+
+        #region NESTED CLASSES
+        private class IndexFieldJsonConverter : JsonConverter<IndexField>
+        {
+            public override void WriteJson(JsonWriter writer, IndexField value, JsonSerializer serializer)
+            {
+                writer.WriteStartObject();
+
+                writer.WritePropertyName("Name");
+                writer.WriteValue(value.Name);
+                writer.WritePropertyName("Type");
+                writer.WriteValue(value.Type.ToString());
+                if (value.Mode != IndexingMode.Default)
+                {
+                    writer.WritePropertyName("Mode");
+                    writer.WriteValue(value.Mode.ToString());
+                }
+                if (value.Store != IndexStoringMode.Default)
+                {
+                    writer.WritePropertyName("Store");
+                    writer.WriteValue(value.Store.ToString());
+                }
+                if (value.TermVector != IndexTermVector.Default)
+                {
+                    writer.WritePropertyName("TermVector");
+                    writer.WriteValue(value.TermVector.ToString());
+                }
+                writer.WritePropertyName("Value");
+                switch (value.Type)
+                {
+                    case IndexValueType.String:
+                        writer.WriteValue(value.StringValue);
+                        break;
+                    case IndexValueType.Bool:
+                        writer.WriteValue(value.BooleanValue);
+                        break;
+                    case IndexValueType.Int:
+                        writer.WriteValue(value.IntegerValue);
+                        break;
+                    case IndexValueType.Long:
+                        writer.WriteValue(value.LongValue);
+                        break;
+                    case IndexValueType.Float:
+                        writer.WriteValue(value.SingleValue);
+                        break;
+                    case IndexValueType.Double:
+                        writer.WriteValue(value.DoubleValue);
+                        break;
+                    case IndexValueType.DateTime:
+                        writer.WriteValue(value.DateTimeValue);
+                        break;
+                    case IndexValueType.StringArray:
+                        writer.WriteStartArray();
+                        writer.WriteRaw("\"" + string.Join("\",\"", value.StringArrayValue) + "\"");
+                        writer.WriteEndArray();
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+
+                writer.WriteEndObject();
+            }
+
+            public override IndexField ReadJson(JsonReader reader, Type objectType, IndexField existingValue,
+                bool hasExistingValue,
+                JsonSerializer serializer)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        [Serializable]
+        private class IndexDocument2 : IEnumerable<IndexField>
+        {
+            private readonly Dictionary<string, IndexField> _fields = new Dictionary<string, IndexField>();
+
+            public void Add(IndexField field)
+            {
+                _fields[field.Name] = field;
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
+            }
+            /// <inheritdoc />
+            public IEnumerator<IndexField> GetEnumerator()
+            {
+                return _fields.Values.GetEnumerator();
+            }
+
+            /* =========================================================================================== */
+
+            private static readonly JsonSerializerSettings SerializerSettings = new JsonSerializerSettings
+            {
+                Converters = new List<JsonConverter> { new IndexFieldJsonConverter() },
+                NullValueHandling = NullValueHandling.Ignore,
+                DateTimeZoneHandling = DateTimeZoneHandling.Utc,
+                Formatting = Formatting.Indented
+            };
+
+            public string Serialize()
+            {
+                using (var writer = new StringWriter())
+                {
+                    JsonSerializer.Create(SerializerSettings).Serialize(writer, this);
+                    var serializedDoc = writer.GetStringBuilder().ToString();
+                    return serializedDoc;
+                }
+            }
+        }
+        #endregion
+    }
+}

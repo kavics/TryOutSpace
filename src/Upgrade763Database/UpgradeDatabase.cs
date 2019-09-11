@@ -19,33 +19,60 @@ namespace Upgrade763Database
 {
     public class UpgradeDatabase : Step
     {
+        public int Parallelism { get; set; }
+
         public override void Execute(ExecutionContext context)
         {
             var connectionString = SenseNet.Configuration.ConnectionStrings.ConnectionString;
             Logger.LogMessage("Connection: " + connectionString);
-            UpgradeVersionDataAsync(connectionString).GetAwaiter().GetResult();
+
+            if (Parallelism == 0)
+                Parallelism = Environment.ProcessorCount;
+            Logger.LogMessage("Parallelism: " + Parallelism);
+
+            //UpgradeVersionDataAsync(connectionString).GetAwaiter().GetResult();
+            UpgradeVersionDataParallel(connectionString);
         }
 
 
-        private static async Task UpgradeVersionDataAsync(string connectionString)
+        //private static async Task UpgradeVersionDataAsync(string connectionString)
+        //{
+        //    var mappings = await LoadFlatPropertyMappingsAsync(connectionString);
+        //    var versionIds = (await GetVersionIdsAsync(connectionString)).ToArray();
+        //    var maxCount = versionIds.Length;
+        //    var count = 0;
+        //    foreach (var versionId in versionIds)
+        //    {
+        //        var serializedIndexDoc = await TransformIndexDocumentAsync(versionId, connectionString);
+        //        await UpgradeVersionRecord(versionId, serializedIndexDoc, connectionString, mappings);
+        //        count++;
+        //        if (count % 100 == 0)
+        //            Logger.LogMessage("  {0}/{1}", count, maxCount);
+        //    }
+        //}
+        private void UpgradeVersionDataParallel(string connectionString)
         {
-            var mappings = await LoadFlatPropertyMappingsAsync(connectionString);
-            var versionIds = (await GetVersionIdsAsync(connectionString)).ToArray();
+            var mappings = LoadFlatPropertyMappingsAsync(connectionString).GetAwaiter().GetResult();
+            var versionIds = GetVersionIdsAsync(connectionString).GetAwaiter().GetResult().ToArray();
             var maxCount = versionIds.Length;
             var count = 0;
-            foreach (var versionId in versionIds)
+
+            var options = new ParallelOptions
             {
-                var serializedIndexDoc = await TransformIndexDocumentAsync(versionId, connectionString);
-
-                await UpgradeVersionRecord(versionId, serializedIndexDoc, connectionString, mappings);
-
+                MaxDegreeOfParallelism = Parallelism,
+            };
+            Parallel.ForEach(versionIds, options, versionId =>
+            {
+                var serializedIndexDoc =
+                    TransformIndexDocumentAsync(versionId, connectionString).GetAwaiter().GetResult();
+                UpgradeVersionRecord(versionId, serializedIndexDoc, connectionString, mappings).GetAwaiter().GetResult();
                 count++;
                 if (count % 100 == 0)
                     Logger.LogMessage("  {0}/{1}", count, maxCount);
-            }
+            });
         }
 
-        private static async Task UpgradeVersionRecord(int versionId, string serializedIndexDoc, string connectionString,
+        private async Task UpgradeVersionRecord(int versionId, string serializedIndexDoc, string connectionString,
             Dictionary<int, Dictionary<string, string>> mappings)
         {
             var dynamicPropertyItems = new List<string>();
@@ -106,7 +133,7 @@ namespace Upgrade763Database
             });
         }
 
-        private static async Task<Dictionary<int, Dictionary<string, string>>> LoadFlatPropertyMappingsAsync(
+        private async Task<Dictionary<int, Dictionary<string, string>>> LoadFlatPropertyMappingsAsync(
             string connectionString)
         {
             var mappings = new Dictionary<int, Dictionary<string, string>>();
@@ -130,7 +157,7 @@ namespace Upgrade763Database
 
             return mappings;
         }
-        private static async Task<IEnumerable<int>> GetVersionIdsAsync(string connectionString)
+        private async Task<IEnumerable<int>> GetVersionIdsAsync(string connectionString)
         {
             var result = new List<int>();
 
@@ -146,7 +173,7 @@ namespace Upgrade763Database
 
         /* =============================================================================== INDEX DOCUMENT */
 
-        private static async Task<string> TransformIndexDocumentAsync(int versionId, string connectionString)
+        private async Task<string> TransformIndexDocumentAsync(int versionId, string connectionString)
         {
             var indexDocBytes = await LoadIndexDocAsync(versionId, connectionString);
             if (indexDocBytes == null)
@@ -160,7 +187,7 @@ namespace Upgrade763Database
 
             return serialized;
         }
-        private static async Task<byte[]> LoadIndexDocAsync(int versionId, string connectionString)
+        private async Task<byte[]> LoadIndexDocAsync(int versionId, string connectionString)
         {
             var sql = "SELECT VersionId, IndexDocument FROM Versions WHERE VersionId = @VersionId";
             byte[] indexDocBytes = null;
@@ -174,7 +201,7 @@ namespace Upgrade763Database
             });
             return indexDocBytes;
         }
-        private static IndexDocument Deserialize(byte[] serializedIndexDocument)
+        private IndexDocument Deserialize(byte[] serializedIndexDocument)
         {
             var docStream = new MemoryStream(serializedIndexDocument);
 

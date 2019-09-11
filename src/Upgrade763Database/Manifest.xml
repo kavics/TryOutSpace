@@ -13,14 +13,12 @@
   <Steps>
     <Phase>
       <!-- ============================================================ RESET DATABASE FOR TEST -->
-      <!--
       <ExecuteDatabaseScript Query="scripts\reset-database-for-test\00-Drop.sql" />
       <ExecuteDatabaseScript Query="scripts\reset-database-for-test\01-Install_Security.sql" />
       <ExecuteDatabaseScript Query="scripts\reset-database-for-test\02-Install_01_Schema.sql" />
       <ExecuteDatabaseScript Query="scripts\reset-database-for-test\03-Install_02_Procs.sql" />
       <ExecuteDatabaseScript Query="scripts\10-DropConstraintsIndexes.sql" />
       <ExecuteDatabaseScript Query="scripts\reset-database-for-test\07-InsertTableData.sql" />
-      -->
       <!-- ============================================================ UPGRADE DATABASE PART-1 -->
       <ExecuteDatabaseScript Query="scripts\10-DropConstraintsIndexes.sql" />
       <ExecuteDatabaseScript Query="scripts\20-CreateNewSnSchema.sql" />
@@ -31,7 +29,7 @@
       <ExecuteDatabaseScript Query="scripts\50-AlterViews.sql" />
       <ExecuteDatabaseScript Query="scripts\60-RebuildVersionsTable.sql" />
       <!-- ============================================================ UPGRADE DATABASE PART-2 -->
-      <UpgradeDatabase />
+      <UpgradeDatabase parallelism="0" />
       <!-- ============================================================ UPGRADE DATABASE PART-3 -->
       <ExecuteDatabaseScript Query="scripts\61-CleanupVersionsTable.sql" />
       <ExecuteDatabaseScript Query="scripts\90-ReCreateConstraintsIndexes.sql" />

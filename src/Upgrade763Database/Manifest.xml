@@ -1,0 +1,41 @@
+﻿<Package type='Tool'>
+  <Id>SenseNet.DB763Upgrade</Id>
+  <Description>sensenet ECM tool for ...</Description>
+  <ReleaseDate>2019-09-11</ReleaseDate>
+  <Version>7.0.0</Version>
+  <Dependencies>
+    <Dependency id='SenseNet.Services' minVersion='7.0.0' />
+  </Dependencies>
+  <Parameters>
+    <Parameter name="@sourceIsRelativeTo" description="If @source is a relative path, where to look for it. Possible values: Package, TargetDirectory.">Package</Parameter>
+    <Parameter name="@logLevel" description="The amount of log information you want to see. Possible values: Info, Progress, Verbose.">Verbose</Parameter>
+  </Parameters>
+  <Steps>
+    <Phase>
+      <!-- ============================================================ RESET DATABASE FOR TEST -->
+      <!--
+      <ExecuteDatabaseScript Query="scripts\reset-database-for-test\00-Drop.sql" />
+      <ExecuteDatabaseScript Query="scripts\reset-database-for-test\01-Install_Security.sql" />
+      <ExecuteDatabaseScript Query="scripts\reset-database-for-test\02-Install_01_Schema.sql" />
+      <ExecuteDatabaseScript Query="scripts\reset-database-for-test\03-Install_02_Procs.sql" />
+      <ExecuteDatabaseScript Query="scripts\10-DropConstraintsIndexes.sql" />
+      <ExecuteDatabaseScript Query="scripts\reset-database-for-test\07-InsertTableData.sql" />
+      -->
+      <!-- ============================================================ UPGRADE DATABASE PART-1 -->
+      <ExecuteDatabaseScript Query="scripts\10-DropConstraintsIndexes.sql" />
+      <ExecuteDatabaseScript Query="scripts\20-CreateNewSnSchema.sql" />
+      <ExecuteDatabaseScript Query="scripts\21-UpgradeSchema.sql" />
+      <ExecuteDatabaseScript Query="scripts\30-CreateNewLongTextProperties.sql" />
+      <ExecuteDatabaseScript Query="scripts\31-UpgradeLongTextProperties.sql" />
+      <ExecuteDatabaseScript Query="scripts\40-DateTime2.sql" />
+      <ExecuteDatabaseScript Query="scripts\50-AlterViews.sql" />
+      <ExecuteDatabaseScript Query="scripts\60-RebuildVersionsTable.sql" />
+      <!-- ============================================================ UPGRADE DATABASE PART-2 -->
+      <UpgradeDatabase />
+      <!-- ============================================================ UPGRADE DATABASE PART-3 -->
+      <ExecuteDatabaseScript Query="scripts\61-CleanupVersionsTable.sql" />
+      <ExecuteDatabaseScript Query="scripts\90-ReCreateConstraintsIndexes.sql" />
+      <ExecuteDatabaseScript Query="scripts\91-DropOldItems.sql" />
+    </Phase>
+  </Steps>
+</Package>

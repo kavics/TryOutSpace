@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SenseNet.Services" Version="7.6.3" />
+    <PackageReference Include="SenseNet.ContentRepository" Version="7.6.3" />
   </ItemGroup>
 
 </Project>

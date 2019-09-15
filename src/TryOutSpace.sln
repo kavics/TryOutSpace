@@ -9,9 +9,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Upgrade763Database", "Upgra
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MidWarez", "MidWarez", "{0B4A0ACC-B7F0-4BE8-B48D-71BA0A7F1F0F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MidWarez.ClassLibrary1", "MidWarez\MidWarez.ClassLibrary1\MidWarez.ClassLibrary1.csproj", "{A2115D0D-8741-40E2-A08E-EB4BF3066BAF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MidWarez.ClassLibrary1", "MidWarez\MidWarez.ClassLibrary1\MidWarez.ClassLibrary1.csproj", "{A2115D0D-8741-40E2-A08E-EB4BF3066BAF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MidWarez.Webapp", "MidWarez\MidWarez.Webapp\MidWarez.Webapp.csproj", "{5F56AD17-1502-4E27-9E28-FF545622AA1B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MidWarez.Webapp", "MidWarez\MidWarez.Webapp\MidWarez.Webapp.csproj", "{5F56AD17-1502-4E27-9E28-FF545622AA1B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CancellationTokenDemo", "CancellationTokenDemo\CancellationTokenDemo.csproj", "{6E964116-22E4-4B6B-93A9-2C56F2B5141A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,6 +37,10 @@ Global
 		{5F56AD17-1502-4E27-9E28-FF545622AA1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5F56AD17-1502-4E27-9E28-FF545622AA1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5F56AD17-1502-4E27-9E28-FF545622AA1B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E964116-22E4-4B6B-93A9-2C56F2B5141A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E964116-22E4-4B6B-93A9-2C56F2B5141A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E964116-22E4-4B6B-93A9-2C56F2B5141A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E964116-22E4-4B6B-93A9-2C56F2B5141A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

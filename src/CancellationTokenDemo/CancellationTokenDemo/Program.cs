@@ -61,7 +61,7 @@ namespace CancellationTokenDemo
         private static Task<string> WorkAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
             var count = 500;
-            for(var i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
             {
                 cancellationToken.ThrowIfCancellationRequested();
 

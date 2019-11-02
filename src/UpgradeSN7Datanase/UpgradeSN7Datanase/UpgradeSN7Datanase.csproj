@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <ApplicationIcon />
+    <OutputType>Exe</OutputType>
+    <StartupObject />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="ConsoleApp1.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SenseNet.ContentRepository" Version="7.6.3" />
+  </ItemGroup>
+
+</Project>

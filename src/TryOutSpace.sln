@@ -3,51 +3,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29306.81
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleApp1", "ConsoleApp1\ConsoleApp1.csproj", "{56E3BD48-953F-4899-9498-64CEDD2E9311}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Upgrade763Database", "Upgrade763Database\Upgrade763Database.csproj", "{1872CB15-0B11-4153-AD1C-2F284A257DAC}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MidWarez", "MidWarez", "{0B4A0ACC-B7F0-4BE8-B48D-71BA0A7F1F0F}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MidWarez.ClassLibrary1", "MidWarez\MidWarez.ClassLibrary1\MidWarez.ClassLibrary1.csproj", "{A2115D0D-8741-40E2-A08E-EB4BF3066BAF}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MidWarez.Webapp", "MidWarez\MidWarez.Webapp\MidWarez.Webapp.csproj", "{5F56AD17-1502-4E27-9E28-FF545622AA1B}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CancellationTokenDemo", "CancellationTokenDemo\CancellationTokenDemo.csproj", "{6E964116-22E4-4B6B-93A9-2C56F2B5141A}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{04409DFA-19E6-43C2-9C93-11030D2B0F66}"
+	ProjectSection(SolutionItems) = preProject
+		_readme.txt = _readme.txt
+	EndProjectSection
 EndProject
 Global
-	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
-		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{56E3BD48-953F-4899-9498-64CEDD2E9311}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{56E3BD48-953F-4899-9498-64CEDD2E9311}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{56E3BD48-953F-4899-9498-64CEDD2E9311}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{56E3BD48-953F-4899-9498-64CEDD2E9311}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1872CB15-0B11-4153-AD1C-2F284A257DAC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1872CB15-0B11-4153-AD1C-2F284A257DAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1872CB15-0B11-4153-AD1C-2F284A257DAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1872CB15-0B11-4153-AD1C-2F284A257DAC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A2115D0D-8741-40E2-A08E-EB4BF3066BAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A2115D0D-8741-40E2-A08E-EB4BF3066BAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A2115D0D-8741-40E2-A08E-EB4BF3066BAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A2115D0D-8741-40E2-A08E-EB4BF3066BAF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5F56AD17-1502-4E27-9E28-FF545622AA1B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5F56AD17-1502-4E27-9E28-FF545622AA1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5F56AD17-1502-4E27-9E28-FF545622AA1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5F56AD17-1502-4E27-9E28-FF545622AA1B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6E964116-22E4-4B6B-93A9-2C56F2B5141A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6E964116-22E4-4B6B-93A9-2C56F2B5141A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6E964116-22E4-4B6B-93A9-2C56F2B5141A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6E964116-22E4-4B6B-93A9-2C56F2B5141A}.Release|Any CPU.Build.0 = Release|Any CPU
-	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{A2115D0D-8741-40E2-A08E-EB4BF3066BAF} = {0B4A0ACC-B7F0-4BE8-B48D-71BA0A7F1F0F}
-		{5F56AD17-1502-4E27-9E28-FF545622AA1B} = {0B4A0ACC-B7F0-4BE8-B48D-71BA0A7F1F0F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A52AB849-F3E9-4D56-B7D4-CD7B54943A12}

@@ -4,13 +4,14 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using SenseNet.ContentRepository;
 
 namespace MethodBasedOperations.Tests
 {
     internal class TestMethodInfo : MethodBase
     {
         private ParameterInfo[] _parameters;
-        public TestMethodInfo(string name, string requiredParameters, string optionalParameters = null)
+        public TestMethodInfo(string name, string requiredParameters, string optionalParameters)
         {
             Name = name;
             _parameters = ParseParameters(requiredParameters, optionalParameters);
@@ -18,7 +19,8 @@ namespace MethodBasedOperations.Tests
         private ParameterInfo[] ParseParameters(string requiredParameters, string optionalParameters)
         {
             var p = 0;
-            var parameters = requiredParameters.Split(',').Select(x => ParseParameter(p++, x, true)).ToArray();
+            var parameters =
+                requiredParameters?.Split(',').Select(x => ParseParameter(p++, x, true)).ToArray() ?? new ParameterInfo[0];
             if(optionalParameters != null)
             {
                 var optionals = optionalParameters.Split(',').Select(x => ParseParameter(p++, x, false)).ToArray();

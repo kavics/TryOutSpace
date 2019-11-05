@@ -9,7 +9,7 @@ namespace MethodBasedOperations.Tests
     [TestClass]
     public class UnitTest1
     {
-        [TestMethod]
+        //[TestMethod]
         public void TestMethod1()
         {
             var method = new TestMethodInfo("fv1", "Content content, string a, int b", "string c, DateTime d");

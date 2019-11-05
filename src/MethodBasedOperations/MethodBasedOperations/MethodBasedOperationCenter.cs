@@ -48,14 +48,16 @@ namespace MethodBasedOperations
             return new[] {baseSignature};
         }
 
-        //public static IEnumerable<string[]> EnumerateCombinations(string requiredNames, string optionalNames)
-        //{
-
-        //}
-        //public static IEnumerable<int[]> EnumerateCombinations(int k)
-        //{
-
-        //}
+        public static IEnumerable<string[]> EnumerateCombinations(string requiredNames, string optionalNames)
+        {
+            throw new NotImplementedException();
+        }
+        public static IEnumerable<int[]> EnumerateCombinations(int k)
+        {
+            for (int n = 1; n <= k; n++)
+                foreach (var item in EnumerateCombinations(k, n))
+                    yield return item;
+        }
         public static IEnumerable<int[]> EnumerateCombinations(int k, int n)
         {
             var digits = new int[n];
@@ -87,28 +89,9 @@ namespace MethodBasedOperations
             return false;
         }
 
+        public static int __add(int a, int b)
+        {
+            return a + b;
+        }
     }
 }
-/*
-    |  required  | optional  |
-    content, x, y, a, b, c, d
-    -------------------------
-0   content, x, y
-1   content, x, y, a
-2   content, x, y, b
-2   content, x, y, c
-2   content, x, y, d
-3   content, x, y, a, b
-4   content, x, y, a, c
-5   content, x, y, a, d
-6   content, x, y, b, c
-7   content, x, y, b, d
-8   content, x, y, c, d
-9   content, x, y, a, b, c
-10  content, x, y, a, b, d
-11  content, x, y, a, c, d
-12  content, x, y, b, c, d
-13  content, x, y, a, b, c, d
-===============================
-
-*/

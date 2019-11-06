@@ -9,7 +9,7 @@ using System.Resources;
 namespace MethodBasedOperations.Tests
 {
     [TestClass]
-    public class UnitTest2
+    public class SearchMethodTests
     {
         [TestMethod]
         public void GetMethodByRequest_Strict_1()

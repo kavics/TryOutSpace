@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using SenseNet.ContentRepository;
 
 namespace MethodBasedOperations
@@ -13,6 +15,11 @@ namespace MethodBasedOperations
         private static readonly OperationInfo[] EmptyMethods = new OperationInfo[0];
         private static readonly Dictionary<string, OperationInfo[]> Methods =
             new Dictionary<string, OperationInfo[]>();
+
+        public static void Reset() //UNDONE: Delete this method
+        {
+            Methods.Clear();
+        }
 
         public static IDictionary<string, OperationInfo[]> Discover()
         {
@@ -192,9 +199,34 @@ namespace MethodBasedOperations
             return string.Join(", ", contexts.Select(c => c.Operation.ToString()));
         }
 
-        public static void Reset() //UNDONE: Delete this method
+        /* ====================================================================== */
+
+        /// <summary>
+        /// Helper method for deserializing the given string representation.
+        /// </summary>
+        /// <param name="models">JSON object that will be deserialized.</param>
+        /// <returns>Deserialized JObject instance.</returns>
+        public static JObject Read(string models)
         {
-            Methods.Clear();
+            if (string.IsNullOrEmpty(models))
+                return null;
+
+            var firstChar = models.Last() == ']' ? '[' : '{';
+            var p = models.IndexOf(firstChar);
+            if (p > 0)
+                models = models.Substring(p);
+
+            var settings = new JsonSerializerSettings { DateFormatHandling = DateFormatHandling.IsoDateFormat };
+            var serializer = JsonSerializer.Create(settings);
+            var jReader = new JsonTextReader(new StringReader(models));
+            var deserialized = serializer.Deserialize(jReader);
+
+            if (deserialized is JObject jObject)
+                return jObject;
+            if (deserialized is JArray jArray)
+                return jArray[0] as JObject;
+
+            throw new SnNotSupportedException();
         }
     }
 }

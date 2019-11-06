@@ -26,7 +26,6 @@ namespace MethodBasedOperations
             if (OptionalParameterNames != null)
                 for (int i = 0; i < OptionalParameterNames.Length; i++)
                     code.Add($"{TypeToString(OptionalParameterTypes[i])} {OptionalParameterNames[i]}?");
-            //var allNames = (RequiredParameterNames ?? _empty).Union((OptionalParameterNames ?? _empty).Select(x => x + "?")).ToArray();
             var parameters = string.Join(", ", code);
             return $"{Method.Name}({parameters})";
         }

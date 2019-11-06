@@ -67,45 +67,33 @@ namespace MethodBasedOperations
         {
             var requestParameterNames = requestParameters.Keys;
 
-            // Get operation info candidates by member name -> Candidates
             var candidates = GetCandidatesByName(methodName);
-
-            // Foreach candidates
-            //   If any required parameter name is missing
-            //   Remove from candidates
             candidates = candidates.Where(x => AllRequiredParametersExist(x, requestParameterNames)).ToArray();
 
-            //    If there is no any candidates
-            //      Return: Method not found ERROR
+            // If there is no any candidates, throw: Operation not found ERROR
             if (candidates.Length == 0)
-                throw new ApplicationException("Method not found: " + GetRequestSignature(methodName, requestParameterNames));
+                throw new OperationNotFoundException("Operation not found: " + GetRequestSignature(methodName, requestParameterNames));
 
-            // Foreach candidates
-            //   Parse all (required/optional) parameters by method's types and memorize the values.
-            //   If there is any parser ERROR
-            //     Remove from candidates
-            // Phase-1: search complete type match
+            // Search candidates by parameter types
+            // Phase-1: search complete type match (strict)
             var contexts = new List<OperationCallingContext>();
             foreach(var candidate in candidates)
                 if (TryParseParameters(candidate, requestParameters, true, out var context))
                     contexts.Add(context);
-            if (contexts.Count == 1)
-                return contexts[0];
-            // Phase-2: search convertible type match
-            contexts.Clear();
-            foreach (var candidate in candidates)
-                if (TryParseParameters(candidate, requestParameters, false, out var context))
-                    contexts.Add(context);
 
-            // If there is no any candidates
-            //    Return: Method not found ERROR
             if (contexts.Count == 0)
-                throw new ApplicationException("Method not found: " + GetRequestSignature(methodName, requestParameterNames));
+            {
+                // Phase-2: search convertible type match
+                foreach (var candidate in candidates)
+                    if (TryParseParameters(candidate, requestParameters, false, out var context))
+                        contexts.Add(context);
+            }
 
-            // If there are more than one candidates
-            //   Return: Ambiguous call ERROR
+            if (contexts.Count == 0)
+                throw new OperationNotFoundException("Operation not found: " + GetRequestSignature(methodName, requestParameterNames));
+
             if (contexts.Count > 1)
-                throw new ApplicationException($"Ambiguous call: {GetRequestSignature(methodName, requestParameterNames)} --> {GetMethodSignatures(contexts)}");
+                throw new AmbiguousMatchException($"Ambiguous call: {GetRequestSignature(methodName, requestParameterNames)} --> {GetMethodSignatures(contexts)}");
 
             return contexts[0];
         }
@@ -132,13 +120,11 @@ namespace MethodBasedOperations
             {
                 var name = candidate.OptionalParameterNames[i];
 
-                // If does not exist in the request
-                //   continue (move the next parameter)
+                // If does not exist in the request: continue (move the next parameter)
                 if (!requestParameters.TryGetValue(name, out var value))
                     continue;
 
-                // If parse request by parameter"s type is not successful
-                //   return false
+                // If parse request by parameter"s type is not successful: return false
                 var type = candidate.OptionalParameterTypes[i];
                 if (!TryParseParameter(name, type, value, strict, out var parsed))
                     return false;
@@ -153,8 +139,7 @@ namespace MethodBasedOperations
                 var value = requestParameters[name];
                 var type = candidate.RequiredParameterTypes[i];
 
-                // If parse request by parameter"s type is not successful
-                //    return false
+                // If parse request by parameter"s type is not successful: return false
                 if (!TryParseParameter(name, type, value, strict, out var parsed))
                     return false;
 
@@ -177,9 +162,17 @@ namespace MethodBasedOperations
                 {
                     if (type == typeof(int))
                     {
-                        if (int.TryParse(stringValue, out var intValue))
+                        if (int.TryParse(stringValue, out var v))
                         {
-                            parsed = intValue;
+                            parsed = v;
+                            return true;
+                        }
+                    }
+                    if (type == typeof(bool))
+                    {
+                        if (bool.TryParse(stringValue, out var v))
+                        {
+                            parsed = v;
                             return true;
                         }
                     }

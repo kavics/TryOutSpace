@@ -1,10 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
 using System.Reflection;
-using System.Resources;
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedVariable
 
 namespace MethodBasedOperations.Tests
 {

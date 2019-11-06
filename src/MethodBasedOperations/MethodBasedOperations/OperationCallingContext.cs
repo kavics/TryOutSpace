@@ -9,8 +9,8 @@ namespace MethodBasedOperations
 {
     public class OperationCallingContext
     {
-        public MethodBasedOperationInfo2 Operation { get; }
-        public OperationCallingContext(MethodBasedOperationInfo2 info)
+        public OperationInfo Operation { get; }
+        public OperationCallingContext(OperationInfo info)
         {
             Operation = info;
         }

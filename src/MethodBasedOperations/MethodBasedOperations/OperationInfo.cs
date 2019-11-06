@@ -8,7 +8,7 @@ using System.Text;
 namespace MethodBasedOperations
 {
     [DebuggerDisplay("{ToString()}")]
-    public class MethodBasedOperationInfo2
+    public class OperationInfo
     {
         public MethodBase Method { get; set; }
         public string[] RequiredParameterNames { get; set; }

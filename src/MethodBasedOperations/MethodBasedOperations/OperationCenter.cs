@@ -10,15 +10,15 @@ namespace MethodBasedOperations
 {
     public class OperationCenter
     {
-        private static readonly MethodBasedOperationInfo2[] EmptyMethods = new MethodBasedOperationInfo2[0];
-        private static readonly Dictionary<string, MethodBasedOperationInfo2[]> Methods =
-            new Dictionary<string, MethodBasedOperationInfo2[]>();
+        private static readonly OperationInfo[] EmptyMethods = new OperationInfo[0];
+        private static readonly Dictionary<string, OperationInfo[]> Methods =
+            new Dictionary<string, OperationInfo[]>();
 
-        public static IDictionary<string, MethodBasedOperationInfo2[]> Discover()
+        public static IDictionary<string, OperationInfo[]> Discover()
         {
             throw new NotImplementedException();
         }
-        public static MethodBasedOperationInfo2 Discover(MethodBase method)
+        public static OperationInfo Discover(MethodBase method)
         {
             var parameters = method.GetParameters();
 
@@ -32,7 +32,7 @@ namespace MethodBasedOperations
             parameters = parameters.Skip(1).ToArray();
             var req = parameters.Where(x => !x.IsOptional).ToArray();
             var opt = parameters.Where(x => x.IsOptional).ToArray();
-            var info = new MethodBasedOperationInfo2
+            var info = new OperationInfo
             {
                 Method = method,
                 RequiredParameterNames = req.Select(x => x.Name).ToArray(),
@@ -43,7 +43,7 @@ namespace MethodBasedOperations
             AddMethod(info);
             return info;
         }
-        private static void AddMethod(MethodBasedOperationInfo2 info)
+        private static void AddMethod(OperationInfo info)
         {
             // This is a custom dynamic array implementation. 
             // Reason: The single / overloaded method rate probably very high (a lot of single vs a few overloads).
@@ -56,7 +56,7 @@ namespace MethodBasedOperations
             }
             else
             {
-                var copy = new MethodBasedOperationInfo2[methods.Length + 1];
+                var copy = new OperationInfo[methods.Length + 1];
                 methods.CopyTo(copy, 0);
                 copy[copy.Length - 1] = info;
                 Methods[info.Method.Name] = copy;
@@ -98,20 +98,20 @@ namespace MethodBasedOperations
             return contexts[0];
         }
 
-        private static MethodBasedOperationInfo2[] GetCandidatesByName(string methodName)
+        private static OperationInfo[] GetCandidatesByName(string methodName)
         {
             if (Methods.TryGetValue(methodName, out var methods))
                 return methods;
             return EmptyMethods;
         }
-        private static bool AllRequiredParametersExist(MethodBasedOperationInfo2 info, string[] requestParameterNames)
+        private static bool AllRequiredParametersExist(OperationInfo info, string[] requestParameterNames)
         {
             foreach (var requiredParameterName in info.RequiredParameterNames)
                 if (!requestParameterNames.Contains(requiredParameterName))
                     return false;
             return true;
         }
-        private static bool TryParseParameters(MethodBasedOperationInfo2 candidate, Dictionary<string, object> requestParameters, bool strict, out OperationCallingContext context)
+        private static bool TryParseParameters(OperationInfo candidate, Dictionary<string, object> requestParameters, bool strict, out OperationCallingContext context)
         {
             context = new OperationCallingContext(candidate);
 

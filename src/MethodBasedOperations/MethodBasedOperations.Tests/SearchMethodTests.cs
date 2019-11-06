@@ -83,7 +83,7 @@ namespace MethodBasedOperations.Tests
         }
         [TestMethod]
         [ExpectedException(typeof(OperationNotFoundException))]
-        public void GetMethodByRequest_NotFound()
+        public void GetMethodByRequest_NotFound_ByName()
         {
             OperationCenter.Reset();
 
@@ -91,6 +91,28 @@ namespace MethodBasedOperations.Tests
 
             // ACTION
             var context = OperationCenter.GetMethodByRequest("fv1", new Dictionary<string, object> { { "a", "asdf" } });
+        }
+        [TestMethod]
+        [ExpectedException(typeof(OperationNotFoundException))]
+        public void GetMethodByRequest_NotFound_ByRequiredParamName()
+        {
+            OperationCenter.Reset();
+
+            OperationCenter.Discover(new TestMethodInfo("fv0", "Content content, string a, string b", null));
+
+            // ACTION
+            var context = OperationCenter.GetMethodByRequest("fv0", new Dictionary<string, object> { { "a", "asdf" } });
+        }
+        [TestMethod]
+        [ExpectedException(typeof(OperationNotFoundException))]
+        public void GetMethodByRequest_NotFound_ByRequiredParamType()
+        {
+            OperationCenter.Reset();
+
+            OperationCenter.Discover(new TestMethodInfo("fv0", "Content content, string a, string b", null));
+
+            // ACTION
+            var context = OperationCenter.GetMethodByRequest("fv0", new Dictionary<string, object> { { "a", "asdf" }, { "b", 42 } });
         }
         [TestMethod]
         [ExpectedException(typeof(AmbiguousMatchException))]
@@ -105,6 +127,20 @@ namespace MethodBasedOperations.Tests
 
             // ACTION
             var context = OperationCenter.GetMethodByRequest("fv1", new Dictionary<string, object> { { "a", "asdf" } });
+        }
+        [TestMethod]
+        [ExpectedException(typeof(OperationNotFoundException))]
+        public void GetMethodByRequest_sss()
+        {
+            OperationCenter.Reset();
+
+            var m0 = OperationCenter.Discover(new TestMethodInfo("fv0", "Content content, string a", "int x"));
+            var m1 = OperationCenter.Discover(new TestMethodInfo("fv1", "Content content, string a", "int x"));
+            var m2 = OperationCenter.Discover(new TestMethodInfo("fv1", "Content content, string a", "bool x"));
+            var m3 = OperationCenter.Discover(new TestMethodInfo("fv2", "Content content, string a", "int x"));
+
+            // ACTION
+            var context = OperationCenter.GetMethodByRequest("fv1", new Dictionary<string, object> { { "a", "asdf" }, { "x", "asdf" } });
         }
     }
 }

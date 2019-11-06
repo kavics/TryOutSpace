@@ -65,7 +65,7 @@ namespace MethodBasedOperations
 
         public static OperationCallingContext GetMethodByRequest(string methodName, Dictionary<string, object> requestParameters)
         {
-            var requestParameterNames = requestParameters.Keys;
+            var requestParameterNames = requestParameters.Keys.ToArray();
 
             var candidates = GetCandidatesByName(methodName);
             candidates = candidates.Where(x => AllRequiredParametersExist(x, requestParameterNames)).ToArray();
@@ -104,7 +104,7 @@ namespace MethodBasedOperations
                 return methods;
             return EmptyMethods;
         }
-        private static bool AllRequiredParametersExist(MethodBasedOperationInfo2 info, IEnumerable<string> requestParameterNames)
+        private static bool AllRequiredParametersExist(MethodBasedOperationInfo2 info, string[] requestParameterNames)
         {
             foreach (var requiredParameterName in info.RequiredParameterNames)
                 if (!requestParameterNames.Contains(requiredParameterName))

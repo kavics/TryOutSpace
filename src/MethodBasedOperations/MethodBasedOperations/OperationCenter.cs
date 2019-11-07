@@ -76,11 +76,7 @@ namespace MethodBasedOperations
         }
         public static OperationCallingContext GetMethodByRequest(string methodName, JObject requestParameters)
         {
-            throw new NotImplementedException(); //UNDONE:!! Develop GetMethodByRequest(string, JObject)
-        }
-        private static OperationCallingContext GetMethodByRequest(string methodName, Dictionary<string, object> requestParameters)
-        {
-            var requestParameterNames = requestParameters.Keys.ToArray();
+            var requestParameterNames = requestParameters.Properties().Select(p => p.Name).ToArray();
 
             var candidates = GetCandidatesByName(methodName);
             candidates = candidates.Where(x => AllRequiredParametersExist(x, requestParameterNames)).ToArray();
@@ -126,7 +122,7 @@ namespace MethodBasedOperations
                     return false;
             return true;
         }
-        private static bool TryParseParameters(OperationInfo candidate, Dictionary<string, object> requestParameters, bool strict, out OperationCallingContext context)
+        private static bool TryParseParameters(OperationInfo candidate, JObject requestParameters, bool strict, out OperationCallingContext context)
         {
             context = new OperationCallingContext(candidate);
 
@@ -163,18 +159,17 @@ namespace MethodBasedOperations
             }
             return true;
         }
-        private static bool TryParseParameter(string name, Type type, object value, bool strict, out object parsed)
+        private static bool TryParseParameter(string name, Type type, JToken token, bool strict, out object parsed)
         {
-            if (value.GetType() == type)
-            {
-                parsed = value;
+            if (type == GetTypeAndValue(type, token, out parsed))
                 return true;
-            }
 
             if (!strict)
             {
-                if (value is string stringValue)
+                //UNDONE: try parse JTokenType.Object / Array
+                if (token.Type == JTokenType.String)
                 {
+                    var stringValue = token.Value<string>();
                     if (type == typeof(int))
                     {
                         if (int.TryParse(stringValue, out var v))
@@ -197,6 +192,61 @@ namespace MethodBasedOperations
 
             parsed = null;
             return false;
+        }
+        private static Type GetTypeAndValue(Type expectedType, JToken token, out object value)
+        {
+            switch (token.Type)
+            {
+                case JTokenType.String:
+                    value = token.Value<string>();
+                    return typeof(string);
+                case JTokenType.Integer:
+                    value = token.Value<int>();
+                    return typeof(int);
+                case JTokenType.Boolean:
+                    value = token.Value<bool>();
+                    return typeof(bool);
+                case JTokenType.Float:
+                    if (expectedType == typeof(float))
+                    {
+                        value = token.Value<float>();
+                        return typeof(float);
+                    }
+                    if (expectedType == typeof(decimal))
+                    {
+                        value = token.Value<decimal>();
+                        return typeof(decimal);
+                    }
+                    value = token.Value<double>();
+                    return typeof(double);
+
+                //UNDONE: handle datetime / guid etc.
+                case JTokenType.Date:
+                case JTokenType.Guid:
+                case JTokenType.Uri:
+                case JTokenType.TimeSpan:
+                    value = token.Value<string>();
+                    return typeof(string);
+
+                //UNDONE: handle array
+                //case JTokenType.Array: break;
+
+                //UNDONE: handle object
+                //case JTokenType.Object: break;
+
+                //UNDONE: handle none / null / undefined
+                //case JTokenType.None: break;
+                //case JTokenType.Null: break;
+                //case JTokenType.Undefined: break;
+
+                //case JTokenType.Constructor:
+                //case JTokenType.Property:
+                //case JTokenType.Comment:
+                //case JTokenType.Raw:
+                //case JTokenType.Bytes:
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
         private static string GetRequestSignature(string methodName, IEnumerable<string> parameterNames)
         {

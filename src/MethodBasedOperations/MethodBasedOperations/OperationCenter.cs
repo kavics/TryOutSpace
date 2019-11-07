@@ -265,8 +265,10 @@ namespace MethodBasedOperations
                 //UNDONE: handle datetime / guid etc.
                 case JTokenType.Date:
                 case JTokenType.Guid:
-                case JTokenType.Uri:
                 case JTokenType.TimeSpan:
+
+                //UNDONE: remains string
+                case JTokenType.Uri:
                     value = token.Value<string>();
                     return typeof(string);
 
@@ -307,6 +309,19 @@ namespace MethodBasedOperations
         private static string GetMethodSignatures(List<OperationCallingContext> contexts)
         {
             return string.Join(", ", contexts.Select(c => c.Operation.ToString()));
+        }
+
+        public static object Invoke(Content content, OperationCallingContext context)
+        {
+            var method = context.Operation.Method;
+            var methodParams = method.GetParameters();
+            var paramValues = new object[methodParams.Length];
+            paramValues[0] = content;
+            for (int i = 1; i < methodParams.Length; i++)
+                if (!context.Parameters.TryGetValue(methodParams[i].Name, out paramValues[i]))
+                    paramValues[i] = methodParams[i].DefaultValue;
+
+            return method.Invoke(null, paramValues);
         }
 
         /* ====================================================================== */

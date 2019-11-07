@@ -1,6 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Reflection;
+using System.Threading;
+
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedVariable
 
@@ -49,6 +52,135 @@ namespace MethodBasedOperations.Tests
             Assert.AreEqual("asdf", context.Parameters["a"]);
             Assert.AreEqual("42", context.Parameters["x"]);
         }
+
+
+        [TestMethod]
+        public void GetMethodByRequest_Bool()
+        {
+            OperationCenter.Reset();
+
+            var m = OperationCenter.Discover(new TestMethodInfo("fv1", "Content content, bool a", null));
+
+            // ACTION-1 strict
+            var context = OperationCenter.GetMethodByRequest("fv1", @"{""a"":true}");
+
+            // ASSERT
+            Assert.AreEqual(m, context.Operation);
+            Assert.AreEqual(1, context.Parameters.Count);
+            Assert.AreEqual(true, context.Parameters["a"]);
+
+
+            // ACTION not strict
+            context = OperationCenter.GetMethodByRequest("fv1", @"{""a"":""true""}");
+
+            // ASSERT
+            Assert.AreEqual(m, context.Operation);
+            Assert.AreEqual(1, context.Parameters.Count);
+            Assert.AreEqual(true, context.Parameters["a"]);
+        }
+        [TestMethod]
+        public void GetMethodByRequest_Decimal()
+        {
+            OperationCenter.Reset();
+
+            var m = OperationCenter.Discover(new TestMethodInfo("fv1", "Content content, decimal a", null));
+
+            // ACTION-1 strict
+            var context = OperationCenter.GetMethodByRequest("fv1", @"{""a"":0.123456789}");
+
+            // ASSERT
+            Assert.AreEqual(m, context.Operation);
+            Assert.AreEqual(1, context.Parameters.Count);
+            Assert.AreEqual(0.123456789m, context.Parameters["a"]);
+
+
+            // ACTION not strict, localized
+            Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("hu-hu");
+            context = OperationCenter.GetMethodByRequest("fv1", @"{""a"":""0,123456789""}");
+
+            // ASSERT
+            Assert.AreEqual(m, context.Operation);
+            Assert.AreEqual(1, context.Parameters.Count);
+            Assert.AreEqual(0.123456789m, context.Parameters["a"]);
+
+            // ACTION not strict, globalized
+            context = OperationCenter.GetMethodByRequest("fv1", @"{""a"":""0.123456789""}");
+
+            // ASSERT
+            Assert.AreEqual(m, context.Operation);
+            Assert.AreEqual(1, context.Parameters.Count);
+            Assert.AreEqual(0.123456789m, context.Parameters["a"]);
+        }
+        [TestMethod]
+        public void GetMethodByRequest_Float()
+        {
+            OperationCenter.Reset();
+
+            var m = OperationCenter.Discover(new TestMethodInfo("fv1", "Content content, float a", null));
+
+            // ACTION-1 strict
+            var context = OperationCenter.GetMethodByRequest("fv1", @"{""a"":0.123456789}");
+
+            // ASSERT
+            Assert.AreEqual(m, context.Operation);
+            Assert.AreEqual(1, context.Parameters.Count);
+            Assert.AreEqual(0.123456789f, context.Parameters["a"]);
+
+
+            // ACTION not strict, localized
+            Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("hu-hu");
+            context = OperationCenter.GetMethodByRequest("fv1", @"{""a"":""0,123456789""}");
+
+            // ASSERT
+            Assert.AreEqual(m, context.Operation);
+            Assert.AreEqual(1, context.Parameters.Count);
+            Assert.AreEqual(0.123456789f, context.Parameters["a"]);
+
+            // ACTION not strict, globalized
+            context = OperationCenter.GetMethodByRequest("fv1", @"{""a"":""0.123456789""}");
+
+            // ASSERT
+            Assert.AreEqual(m, context.Operation);
+            Assert.AreEqual(1, context.Parameters.Count);
+            Assert.AreEqual(0.123456789f, context.Parameters["a"]);
+        }
+        [TestMethod]
+        public void GetMethodByRequest_Double()
+        {
+            OperationCenter.Reset();
+
+            var m = OperationCenter.Discover(new TestMethodInfo("fv1", "Content content, double a", null));
+
+            // ACTION-1 strict
+            var context = OperationCenter.GetMethodByRequest("fv1", @"{""a"":0.123456789}");
+
+            // ASSERT
+            Assert.AreEqual(m, context.Operation);
+            Assert.AreEqual(1, context.Parameters.Count);
+            Assert.AreEqual(0.123456789d, context.Parameters["a"]);
+
+
+            // ACTION not strict, localized
+            Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("hu-hu");
+            context = OperationCenter.GetMethodByRequest("fv1", @"{""a"":""0,123456789""}");
+
+            // ASSERT
+            Assert.AreEqual(m, context.Operation);
+            Assert.AreEqual(1, context.Parameters.Count);
+            Assert.AreEqual(0.123456789d, context.Parameters["a"]);
+
+            // ACTION not strict, globalized
+            context = OperationCenter.GetMethodByRequest("fv1", @"{""a"":""0.123456789""}");
+
+            // ASSERT
+            Assert.AreEqual(m, context.Operation);
+            Assert.AreEqual(1, context.Parameters.Count);
+            Assert.AreEqual(0.123456789d, context.Parameters["a"]);
+        }
+
+
+
+
         [TestMethod]
         public void GetMethodByRequest_NotStrict_1()
         {
@@ -128,7 +260,7 @@ namespace MethodBasedOperations.Tests
         }
         [TestMethod]
         [ExpectedException(typeof(OperationNotFoundException))]
-        public void GetMethodByRequest_sss()
+        public void GetMethodByRequest_UnmatchedOptional()
         {
             OperationCenter.Reset();
 

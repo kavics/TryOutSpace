@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -181,6 +182,45 @@ namespace MethodBasedOperations
                     if (type == typeof(bool))
                     {
                         if (bool.TryParse(stringValue, out var v))
+                        {
+                            parsed = v;
+                            return true;
+                        }
+                    }
+                    if (type == typeof(decimal))
+                    {
+                        if (decimal.TryParse(stringValue, out var v))
+                        {
+                            parsed = v;
+                            return true;
+                        }
+                        if (decimal.TryParse(stringValue, NumberStyles.Any, CultureInfo.InvariantCulture, out v))
+                        {
+                            parsed = v;
+                            return true;
+                        }
+                    }
+                    if (type == typeof(float))
+                    {
+                        if (float.TryParse(stringValue, out var v))
+                        {
+                            parsed = v;
+                            return true;
+                        }
+                        if (float.TryParse(stringValue, NumberStyles.Any, CultureInfo.InvariantCulture, out v))
+                        {
+                            parsed = v;
+                            return true;
+                        }
+                    }
+                    if (type == typeof(double))
+                    {
+                        if (double.TryParse(stringValue, out var v))
+                        {
+                            parsed = v;
+                            return true;
+                        }
+                        if (double.TryParse(stringValue, NumberStyles.Any, CultureInfo.InvariantCulture, out v))
                         {
                             parsed = v;
                             return true;

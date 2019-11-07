@@ -43,6 +43,8 @@ namespace MethodBasedOperations.Tests
                 case "int": return typeof(int);
                 case "DateTime": return typeof(DateTime);
                 case "double": return typeof(double);
+                case "decimal": return typeof(decimal);
+                case "float": return typeof(float);
                 case "bool": return typeof(bool);
                 default:
                     throw new ApplicationException("Unknown type: " + src);

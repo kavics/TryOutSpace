@@ -233,6 +233,8 @@ namespace MethodBasedOperations
             parsed = null;
             return false;
         }
+        private static readonly JsonSerializer ValueDeserializer = JsonSerializer.Create(
+            new JsonSerializerSettings { MissingMemberHandling = MissingMemberHandling.Error });
         private static Type GetTypeAndValue(Type expectedType, JToken token, out object value)
         {
             switch (token.Type)
@@ -272,7 +274,17 @@ namespace MethodBasedOperations
                 //case JTokenType.Array: break;
 
                 //UNDONE: handle object
-                //case JTokenType.Object: break;
+                case JTokenType.Object:
+                    try
+                    {
+                        value = token.ToObject(expectedType, ValueDeserializer);
+                        return expectedType;
+                    }
+                    catch (JsonSerializationException)
+                    {
+                        value = null;
+                        return typeof(object);
+                    }
 
                 //UNDONE: handle none / null / undefined
                 //case JTokenType.None: break;

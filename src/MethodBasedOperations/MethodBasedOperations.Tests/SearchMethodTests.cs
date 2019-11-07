@@ -160,7 +160,46 @@ namespace MethodBasedOperations.Tests
             Assert.AreEqual(0.123456789d, context.Parameters["a"]);
         }
 
+        [TestMethod]
+        public void GetMethodByRequest_Spaceship()
+        {
+            OperationCenter.Reset();
 
+            var m1 = OperationCenter.Discover(new TestMethodInfo("fv1", "Content content, Spaceship a", null));
+            var m2 = OperationCenter.Discover(new TestMethodInfo("fv1", "Content content, Elephant a", null));
+
+            // ACTION-1
+            var context = OperationCenter.GetMethodByRequest("fv1",
+                @"{""a"":{""Name"":""Space Bender 8"", ""Class"":""Big F Vehicle"", ""Length"":444}}");
+
+            // ASSERT
+            Assert.AreEqual(m1, context.Operation);
+            Assert.AreEqual(1, context.Parameters.Count);
+            Assert.AreEqual(typeof(Spaceship), context.Parameters["a"].GetType());
+            var spaceship = (Spaceship)context.Parameters["a"];
+            Assert.AreEqual("Space Bender 8", spaceship.Name);
+            Assert.AreEqual("Big F Vehicle", spaceship.Class);
+            Assert.AreEqual(444, spaceship.Length);
+        }
+        [TestMethod]
+        public void GetMethodByRequest_Elephant()
+        {
+            OperationCenter.Reset();
+
+            var m1 = OperationCenter.Discover(new TestMethodInfo("fv1", "Content content, Spaceship a", null));
+            var m2 = OperationCenter.Discover(new TestMethodInfo("fv1", "Content content, Elephant a", null));
+
+            // ACTION-1
+            var context = OperationCenter.GetMethodByRequest("fv1", @"{""a"":{""Snout"":42, ""Height"":44}}");
+
+            // ASSERT
+            Assert.AreEqual(m2, context.Operation);
+            Assert.AreEqual(1, context.Parameters.Count);
+            Assert.AreEqual(typeof(Elephant), context.Parameters["a"].GetType());
+            var elephant = (Elephant)context.Parameters["a"];
+            Assert.AreEqual(42, elephant.Snout);
+            Assert.AreEqual(44, elephant.Height);
+        }
 
 
         [TestMethod]

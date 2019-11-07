@@ -44,6 +44,10 @@ namespace MethodBasedOperations.Tests
                 case "decimal": return typeof(decimal);
                 case "float": return typeof(float);
                 case "bool": return typeof(bool);
+
+                case "Elephant": return typeof(Elephant);
+                case "Spaceship": return typeof(Spaceship);
+
                 default:
                     throw new ApplicationException("Unknown type: " + src);
             }

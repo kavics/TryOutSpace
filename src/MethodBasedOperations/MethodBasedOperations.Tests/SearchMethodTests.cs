@@ -21,7 +21,7 @@ namespace MethodBasedOperations.Tests
 
             // ACTION
             var context = OperationCenter.GetMethodByRequest("fv1",
-                new Dictionary<string, object> { {"a", "asdf" }, {"b", "qwer" }, {"y", 12 }, {"x", 42 } });
+                @"{""a"":""asdf"",""b"":""qwer"",""y"":12,""x"":42}");
 
             // ASSERT
             Assert.AreEqual(m1, context.Operation);
@@ -41,7 +41,7 @@ namespace MethodBasedOperations.Tests
 
             // ACTION
             var context = OperationCenter.GetMethodByRequest("fv1",
-                new Dictionary<string, object> { { "a", "asdf" }, { "b", "qwer" }, { "y", 12 }, { "x", "42" } });
+                @"{""a"":""asdf"",""b"":""qwer"",""y"":12,""x"":""42"" }");
 
             // ASSERT
             Assert.AreEqual(m2, context.Operation);
@@ -61,7 +61,7 @@ namespace MethodBasedOperations.Tests
 
             // ACTION-1
             var context = OperationCenter.GetMethodByRequest("fv1",
-                new Dictionary<string, object> { { "a", "asdf" }, { "b", "qwer" }, { "y", 12 }, { "x", "42" } });
+                @"{""a"":""asdf"",""b"":""qwer"",""y"":12,""x"":""42""}");
 
             // ASSERT-1
             Assert.AreEqual(m1, context.Operation);
@@ -71,7 +71,7 @@ namespace MethodBasedOperations.Tests
 
             // ACTION-2
             context = OperationCenter.GetMethodByRequest("fv1",
-                new Dictionary<string, object> { { "a", "asdf" }, { "b", "qwer" }, { "y", 12 }, { "x", "true" } });
+                @"{ ""a"":""asdf"",""b"":""qwer"",""y"":12,""x"":""true""}");
 
             // ASSERT-2
             Assert.AreEqual(m2, context.Operation);
@@ -88,7 +88,7 @@ namespace MethodBasedOperations.Tests
             OperationCenter.Discover(new TestMethodInfo("fv0", "Content content, string a", "int x"));
 
             // ACTION
-            var context = OperationCenter.GetMethodByRequest("fv1", new Dictionary<string, object> { { "a", "asdf" } });
+            var context = OperationCenter.GetMethodByRequest("fv1", @"{""a"":""asdf""}");
         }
         [TestMethod]
         [ExpectedException(typeof(OperationNotFoundException))]
@@ -99,7 +99,7 @@ namespace MethodBasedOperations.Tests
             OperationCenter.Discover(new TestMethodInfo("fv0", "Content content, string a, string b", null));
 
             // ACTION
-            var context = OperationCenter.GetMethodByRequest("fv0", new Dictionary<string, object> { { "a", "asdf" } });
+            var context = OperationCenter.GetMethodByRequest("fv0", @"{""a"":""asdf""}");
         }
         [TestMethod]
         [ExpectedException(typeof(OperationNotFoundException))]
@@ -110,7 +110,7 @@ namespace MethodBasedOperations.Tests
             OperationCenter.Discover(new TestMethodInfo("fv0", "Content content, string a, string b", null));
 
             // ACTION
-            var context = OperationCenter.GetMethodByRequest("fv0", new Dictionary<string, object> { { "a", "asdf" }, { "b", 42 } });
+            var context = OperationCenter.GetMethodByRequest("fv0", @"{""a"":""asdf"",""b"":42}");
         }
         [TestMethod]
         [ExpectedException(typeof(AmbiguousMatchException))]
@@ -124,7 +124,7 @@ namespace MethodBasedOperations.Tests
             var m3 = OperationCenter.Discover(new TestMethodInfo("fv2", "Content content, string a", "int x"));
 
             // ACTION
-            var context = OperationCenter.GetMethodByRequest("fv1", new Dictionary<string, object> { { "a", "asdf" } });
+            var context = OperationCenter.GetMethodByRequest("fv1", @"{""a"":""asdf""}");
         }
         [TestMethod]
         [ExpectedException(typeof(OperationNotFoundException))]
@@ -138,7 +138,7 @@ namespace MethodBasedOperations.Tests
             var m3 = OperationCenter.Discover(new TestMethodInfo("fv2", "Content content, string a", "int x"));
 
             // ACTION
-            var context = OperationCenter.GetMethodByRequest("fv1", new Dictionary<string, object> { { "a", "asdf" }, { "x", "asdf" } });
+            var context = OperationCenter.GetMethodByRequest("fv1", @"{ ""a"":""asdf"",""x"":""asdf""}");
         }
     }
 }

@@ -70,7 +70,15 @@ namespace MethodBasedOperations
             }
         }
 
-        public static OperationCallingContext GetMethodByRequest(string methodName, Dictionary<string, object> requestParameters)
+        public static OperationCallingContext GetMethodByRequest(string methodName, string requestBody)
+        {
+            return GetMethodByRequest(methodName, Read(requestBody));
+        }
+        public static OperationCallingContext GetMethodByRequest(string methodName, JObject requestParameters)
+        {
+            throw new NotImplementedException(); //UNDONE:!! Develop GetMethodByRequest(string, JObject)
+        }
+        private static OperationCallingContext GetMethodByRequest(string methodName, Dictionary<string, object> requestParameters)
         {
             var requestParameterNames = requestParameters.Keys.ToArray();
 

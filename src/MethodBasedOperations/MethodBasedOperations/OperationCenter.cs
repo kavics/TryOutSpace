@@ -55,7 +55,7 @@ namespace MethodBasedOperations
         {
             // This is a custom dynamic array implementation. 
             // Reason: The single / overloaded method rate probably very high (a lot of single vs a few overloads).
-            // Therefore the usual List<T> approach is ineffecive because the most List<T> item will contain
+            // Therefore the usual List<T> approach is ineffective because the most List<T> item will contain
             // many unnecessary empty pointers.
             if (!Methods.TryGetValue(info.Method.Name, out var methods))
             {

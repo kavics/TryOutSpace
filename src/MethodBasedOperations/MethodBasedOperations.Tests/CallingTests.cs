@@ -121,5 +121,48 @@ namespace MethodBasedOperations.Tests
             Assert.AreEqual(0.0m, objects[4]);
             Assert.AreEqual(12.345d, objects[5]);
         }
+
+        [TestMethod]
+        public void Call_NullAndDefault()
+        {
+            OperationCenter.Reset();
+
+            var m = OperationCenter.Discover(typeof(TestOperations).GetMethod("Op1"));
+            var context = OperationCenter.GetMethodByRequest("Op1",
+                @"{""a"":null, ""b"":null, ""c"":null, ""d"":null, ""e"":null, ""f"":null}");
+
+            // ACTION
+            var result = OperationCenter.Invoke(new Content(), context);
+
+            // ASSERT
+            var objects = (object[])result;
+            Assert.AreEqual(null, objects[0]);
+            Assert.AreEqual(0, objects[1]);
+            Assert.AreEqual(false, objects[2]);
+            Assert.AreEqual(0.0f, objects[3]);
+            Assert.AreEqual(0.0m, objects[4]);
+            Assert.AreEqual(0.0d, objects[5]);
+        }
+        [TestMethod]
+        public void Call_UndefinedAndDefault()
+        {
+            OperationCenter.Reset();
+
+            var m = OperationCenter.Discover(typeof(TestOperations).GetMethod("Op1"));
+            var context = OperationCenter.GetMethodByRequest("Op1",
+                @"{""a"":undefined, ""b"":undefined, ""c"":undefined, ""d"":undefined, ""e"":undefined, ""f"":undefined}");
+
+            // ACTION
+            var result = OperationCenter.Invoke(new Content(), context);
+
+            // ASSERT
+            var objects = (object[])result;
+            Assert.AreEqual(null, objects[0]);
+            Assert.AreEqual(0, objects[1]);
+            Assert.AreEqual(false, objects[2]);
+            Assert.AreEqual(0.0f, objects[3]);
+            Assert.AreEqual(0.0m, objects[4]);
+            Assert.AreEqual(0.0d, objects[5]);
+        }
     }
 }

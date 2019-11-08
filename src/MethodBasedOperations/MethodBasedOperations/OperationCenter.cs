@@ -167,7 +167,6 @@ namespace MethodBasedOperations
 
             if (!strict)
             {
-                //UNDONE: try parse JTokenType.Object / Array
                 if (token.Type == JTokenType.String)
                 {
                     var stringValue = token.Value<string>();
@@ -226,7 +225,7 @@ namespace MethodBasedOperations
                             return true;
                         }
                     }
-                    //UNDONE: try parse further opportunities from string to "type"
+                    //TODO: try parse further opportunities from string to "type"
                 }
             }
 
@@ -262,20 +261,6 @@ namespace MethodBasedOperations
                     value = token.Value<double>();
                     return typeof(double);
 
-                //UNDONE: handle datetime / guid etc.
-                case JTokenType.Date:
-                case JTokenType.Guid:
-                case JTokenType.TimeSpan:
-
-                //UNDONE: remains string
-                case JTokenType.Uri:
-                    value = token.Value<string>();
-                    return typeof(string);
-
-                //UNDONE: handle array
-                //case JTokenType.Array: break;
-
-                //UNDONE: handle object
                 case JTokenType.Object:
                     try
                     {
@@ -288,10 +273,21 @@ namespace MethodBasedOperations
                         return typeof(object);
                     }
 
-                //UNDONE: handle none / null / undefined
-                //case JTokenType.None: break;
-                //case JTokenType.Null: break;
-                //case JTokenType.Undefined: break;
+                //UNDONE: handle array
+                //case JTokenType.Array: break;
+
+                case JTokenType.None:
+                case JTokenType.Null:
+                case JTokenType.Undefined:
+                    value = expectedType.IsValueType ? Activator.CreateInstance(expectedType) : null;
+                    return expectedType;
+
+                case JTokenType.Date:
+                case JTokenType.Guid:
+                case JTokenType.TimeSpan:
+                case JTokenType.Uri:
+                    value = token.Value<string>();
+                    return typeof(string);
 
                 //case JTokenType.Constructor:
                 //case JTokenType.Property:

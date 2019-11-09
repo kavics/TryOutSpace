@@ -1,4 +1,6 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Reflection;
+using MethodBasedOperations.Tests.Accessors;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 // ReSharper disable UnusedVariable
@@ -12,21 +14,21 @@ namespace MethodBasedOperations.Tests
         [ExpectedException(typeof(JsonReaderException))]
         public void Request_InvalidJson()
         {
-            var request = OperationCenter.Read("asdf");
+            var request = Read("asdf");
         }
         [TestMethod]
         public void Request_Invalid()
         {
-            var request = OperationCenter.Read("");
+            var request = Read("");
             Assert.IsNull(request);
 
-            request = OperationCenter.Read("['asdf']");
+            request = Read("['asdf']");
             Assert.IsNull(request);
         }
         [TestMethod]
         public void Request_Object()
         {
-            var request = OperationCenter.Read("{'a':'asdf'}");
+            var request = Read("{'a':'asdf'}");
             Assert.AreEqual(JTokenType.String, request["a"].Type);
             Assert.AreEqual("{\"a\":\"asdf\"}", request.ToString()
                 .Replace("\r", "").Replace("\n", "").Replace(" ", ""));
@@ -34,7 +36,7 @@ namespace MethodBasedOperations.Tests
         [TestMethod]
         public void Request_Models()
         {
-            var request = OperationCenter.Read("models=[{'a':'asdf'}]");
+            var request = Read("models=[{'a':'asdf'}]");
             Assert.AreEqual(JTokenType.String, request["a"].Type);
             Assert.AreEqual("{\"a\":\"asdf\"}", request.ToString()
                 .Replace("\r", "").Replace("\n", "").Replace(" ", ""));
@@ -42,7 +44,7 @@ namespace MethodBasedOperations.Tests
         [TestMethod]
         public void Request_Properties()
         {
-            var request = OperationCenter.Read("models=[{'a':42, 'b':false, 'c':'asdf', 'd':[], 'e':{a:12}}]");
+            var request = Read("models=[{'a':42, 'b':false, 'c':'asdf', 'd':[], 'e':{a:12}}]");
             Assert.AreEqual(JTokenType.Integer, request["a"].Type);
             Assert.AreEqual(JTokenType.Boolean, request["b"].Type);
             Assert.AreEqual(JTokenType.String, request["c"].Type);
@@ -52,11 +54,26 @@ namespace MethodBasedOperations.Tests
         [TestMethod]
         public void Request_Float()
         {
-            var request = OperationCenter.Read("models=[{'a':4.2}]");
+            var request = Read("models=[{'a':4.2}]");
             Assert.AreEqual(JTokenType.Float, request["a"].Type);
             Assert.AreEqual(4.2f, request["a"].Value<float>());
             Assert.AreEqual(4.2d, request["a"].Value<double>());
             Assert.AreEqual(4.2m, request["a"].Value<decimal>());
+        }
+
+        /* ======================================================================== TOOLS */
+
+        TypeAccessor OpCenter = new TypeAccessor(typeof(OperationCenter));
+        private JObject Read(string requestBody)
+        {
+            try
+            {
+                return (JObject) OpCenter.InvokeStatic("Read", requestBody);
+            }
+            catch (TargetInvocationException e)
+            {
+                throw e.InnerException;
+            }
         }
     }
 }

@@ -1,20 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Reflection;
+using MethodBasedOperations.Tests.Accessors;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SenseNet.ContentRepository;
 
 namespace MethodBasedOperations.Tests
 {
     [TestClass]
-    public class CallingTests
+    public class CallingTests : OperationTestBase
     {
         [TestMethod]
         public void Call_RequiredPrimitives()
         {
-            OperationCenter.Reset();
+            Reset();
 
-            var m = OperationCenter.Discover(typeof(TestOperations).GetMethod("Op1"));
+            AddMethod(typeof(TestOperations).GetMethod("Op1"));
             var context = OperationCenter.GetMethodByRequest("Op1",
                 @"{""a"":""asdf"", ""b"":42, ""c"":true, ""d"":0.12, ""e"":0.13, ""f"":0.14}");
 
@@ -33,9 +32,9 @@ namespace MethodBasedOperations.Tests
         [TestMethod]
         public void Call_OptionalPrimitives()
         {
-            OperationCenter.Reset();
+            Reset();
 
-            var m = OperationCenter.Discover(typeof(TestOperations).GetMethod("Op2"));
+            AddMethod(typeof(TestOperations).GetMethod("Op2"));
 
             // ACTION
             var context = OperationCenter.GetMethodByRequest("Op2", @"{""dummy"":0}");
@@ -125,9 +124,9 @@ namespace MethodBasedOperations.Tests
         [TestMethod]
         public void Call_NullAndDefault()
         {
-            OperationCenter.Reset();
+            Reset();
 
-            var m = OperationCenter.Discover(typeof(TestOperations).GetMethod("Op1"));
+            AddMethod(typeof(TestOperations).GetMethod("Op1"));
             var context = OperationCenter.GetMethodByRequest("Op1",
                 @"{""a"":null, ""b"":null, ""c"":null, ""d"":null, ""e"":null, ""f"":null}");
 
@@ -146,9 +145,9 @@ namespace MethodBasedOperations.Tests
         [TestMethod]
         public void Call_UndefinedAndDefault()
         {
-            OperationCenter.Reset();
+            Reset();
 
-            var m = OperationCenter.Discover(typeof(TestOperations).GetMethod("Op1"));
+            AddMethod(typeof(TestOperations).GetMethod("Op1"));
             var context = OperationCenter.GetMethodByRequest("Op1",
                 @"{""a"":undefined, ""b"":undefined, ""c"":undefined, ""d"":undefined, ""e"":undefined, ""f"":undefined}");
 

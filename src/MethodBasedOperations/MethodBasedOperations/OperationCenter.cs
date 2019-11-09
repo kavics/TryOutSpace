@@ -11,23 +11,37 @@ using SenseNet.ContentRepository;
 
 namespace MethodBasedOperations
 {
-    public class OperationCenter
+    public class OperationCenter // DefaultActionResolver
     {
         private static readonly OperationInfo[] EmptyMethods = new OperationInfo[0];
-        private static readonly Dictionary<string, OperationInfo[]> Methods =
+        private static readonly Dictionary<string, OperationInfo[]> Operations =
             new Dictionary<string, OperationInfo[]>();
 
-        public static void Reset() //UNDONE: Delete this method
+        public static void Discover()
         {
-            Methods.Clear();
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                try
+                {
+                    foreach (var type in assembly.GetExportedTypes())
+                        foreach (var method in type.GetMethods(BindingFlags.Static | BindingFlags.Public))
+                            AddMethod(method);
+                }
+                catch (NotSupportedException)
+                {
+                }
+            }
         }
+        private static OperationInfo AddMethod(MethodBase method)
+        {
+            var attributes = method.GetCustomAttributes().ToArray();
+            return AddMethod(method, attributes);
+        }
+        private static OperationInfo AddMethod(MethodBase method, Attribute[] attributes)
+        {
+            if (!(attributes.Any(a => a is ODataFunctionAttribute || a is ODataActionAttribute)))
+                return null;
 
-        public static IDictionary<string, OperationInfo[]> Discover()
-        {
-            throw new NotImplementedException();
-        }
-        public static OperationInfo Discover(MethodBase method)
-        {
             var parameters = method.GetParameters();
 
             if (parameters.Length == 0)
@@ -57,17 +71,17 @@ namespace MethodBasedOperations
             // Reason: The single / overloaded method rate probably very high (a lot of single vs a few overloads).
             // Therefore the usual List<T> approach is ineffective because the most List<T> item will contain
             // many unnecessary empty pointers.
-            if (!Methods.TryGetValue(info.Method.Name, out var methods))
+            if (!Operations.TryGetValue(info.Method.Name, out var methods))
             {
                 methods = new[] {info};
-                Methods.Add(info.Method.Name, methods);
+                Operations.Add(info.Method.Name, methods);
             }
             else
             {
                 var copy = new OperationInfo[methods.Length + 1];
                 methods.CopyTo(copy, 0);
                 copy[copy.Length - 1] = info;
-                Methods[info.Method.Name] = copy;
+                Operations[info.Method.Name] = copy;
             }
         }
 
@@ -75,7 +89,7 @@ namespace MethodBasedOperations
         {
             return GetMethodByRequest(methodName, Read(requestBody));
         }
-        public static OperationCallingContext GetMethodByRequest(string methodName, JObject requestParameters)
+        private static OperationCallingContext GetMethodByRequest(string methodName, JObject requestParameters)
         {
             var requestParameterNames = requestParameters.Properties().Select(p => p.Name).ToArray();
 
@@ -112,7 +126,7 @@ namespace MethodBasedOperations
 
         private static OperationInfo[] GetCandidatesByName(string methodName)
         {
-            if (Methods.TryGetValue(methodName, out var methods))
+            if (Operations.TryGetValue(methodName, out var methods))
                 return methods;
             return EmptyMethods;
         }
@@ -327,7 +341,7 @@ namespace MethodBasedOperations
         /// </summary>
         /// <param name="models">JSON object that will be deserialized.</param>
         /// <returns>Deserialized JObject instance.</returns>
-        public static JObject Read(string models)
+        private static JObject Read(string models)
         {
             if (string.IsNullOrEmpty(models))
                 return null;

@@ -13,6 +13,7 @@ namespace MethodBasedOperations
         public Type[] RequiredParameterTypes { get; set; }
         public string[] OptionalParameterNames { get; set; }
         public Type[] OptionalParameterTypes { get; set; }
+        public Attribute[] Attributes { get; set; }
 
         private readonly string[] _empty = new string[0];
         public override string ToString()

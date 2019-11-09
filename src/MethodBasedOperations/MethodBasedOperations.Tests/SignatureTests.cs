@@ -1,17 +1,21 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using System.Reflection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SenseNet.ContentRepository;
 
 namespace MethodBasedOperations.Tests
 {
     [TestClass]
-    public class SignatureTests
+    public class SignatureTests : OperationTestBase
     {
+
         [TestMethod]
         public void MBO_GetInfo_0Prm()
         {
             var method = new TestMethodInfo("fv1", null, null);
 
-            var info = OperationCenter.Discover(method);
+            var info = AddMethod(method);
 
             Assert.IsNull(info);
         }
@@ -20,7 +24,7 @@ namespace MethodBasedOperations.Tests
         {
             var method = new TestMethodInfo("fv1", "string a", null);
 
-            var info = OperationCenter.Discover(method);
+            var info = AddMethod(method);
 
             Assert.IsNull(info);
         }
@@ -29,7 +33,7 @@ namespace MethodBasedOperations.Tests
         {
             var method = new TestMethodInfo("fv1", null, "Content content");
 
-            var info = OperationCenter.Discover(method);
+            var info = AddMethod(method);
 
             Assert.IsNull(info);
         }
@@ -38,7 +42,7 @@ namespace MethodBasedOperations.Tests
         {
             var method = new TestMethodInfo("fv1", "Content content", null);
 
-            var info = OperationCenter.Discover(method);
+            var info = AddMethod(method);
 
             Assert.AreEqual(0, info.RequiredParameterNames.Length);
             Assert.AreEqual(0, info.RequiredParameterTypes.Length);
@@ -51,7 +55,7 @@ namespace MethodBasedOperations.Tests
             var method = new TestMethodInfo("fv1", "Content content, string a, int b", "string c, DateTime d");
 
             // ACTION
-            var info = OperationCenter.Discover(method);
+            var info = AddMethod(method);
 
             // ASSERT
             Assert.AreEqual(method, info.Method);

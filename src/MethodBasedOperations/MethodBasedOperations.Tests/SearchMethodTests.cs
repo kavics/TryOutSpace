@@ -1,7 +1,9 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Collections.Generic;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Globalization;
 using System.Reflection;
 using System.Threading;
+using MethodBasedOperations.Tests.Accessors;
 
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedVariable
@@ -9,17 +11,28 @@ using System.Threading;
 namespace MethodBasedOperations.Tests
 {
     [TestClass]
-    public class SearchMethodTests
+    public class SearchMethodTests : OperationTestBase
     {
+        [TestMethod]
+        public void Discover()
+        {
+            Reset();
+
+            OperationCenter.Discover();
+
+            var discovered = (Dictionary<string, OperationInfo[]>)new TypeAccessor(typeof(OperationCenter)).GetStaticField("Operations");
+            int q = 1;
+        }
+
         [TestMethod]
         public void GetMethodByRequest_Strict_1()
         {
-            OperationCenter.Reset();
+            Reset();
 
-            var m0 = OperationCenter.Discover(new TestMethodInfo("fv0", "Content content, string a", "int x"));
-            var m1 = OperationCenter.Discover(new TestMethodInfo("fv1", "Content content, string a", "int x"));
-            var m2 = OperationCenter.Discover(new TestMethodInfo("fv1", "Content content, string a", "string x"));
-            var m3 = OperationCenter.Discover(new TestMethodInfo("fv2", "Content content, string a", "int x"));
+            var m0 = AddMethod(new TestMethodInfo("fv0", "Content content, string a", "int x"));
+            var m1 = AddMethod(new TestMethodInfo("fv1", "Content content, string a", "int x"));
+            var m2 = AddMethod(new TestMethodInfo("fv1", "Content content, string a", "string x"));
+            var m3 = AddMethod(new TestMethodInfo("fv2", "Content content, string a", "int x"));
 
             // ACTION
             var context = OperationCenter.GetMethodByRequest("fv1",
@@ -34,12 +47,12 @@ namespace MethodBasedOperations.Tests
         [TestMethod]
         public void GetMethodByRequest_Strict_2()
         {
-            OperationCenter.Reset();
+            Reset();
 
-            var m0 = OperationCenter.Discover(new TestMethodInfo("fv0", "Content content, string a", "int x"));
-            var m1 = OperationCenter.Discover(new TestMethodInfo("fv1", "Content content, string a", "int x"));
-            var m2 = OperationCenter.Discover(new TestMethodInfo("fv1", "Content content, string a", "string x"));
-            var m3 = OperationCenter.Discover(new TestMethodInfo("fv2", "Content content, string a", "int x"));
+            var m0 = AddMethod(new TestMethodInfo("fv0", "Content content, string a", "int x"));
+            var m1 = AddMethod(new TestMethodInfo("fv1", "Content content, string a", "int x"));
+            var m2 = AddMethod(new TestMethodInfo("fv1", "Content content, string a", "string x"));
+            var m3 = AddMethod(new TestMethodInfo("fv2", "Content content, string a", "int x"));
 
             // ACTION
             var context = OperationCenter.GetMethodByRequest("fv1",
@@ -54,9 +67,9 @@ namespace MethodBasedOperations.Tests
         [TestMethod]
         public void GetMethodByRequest_Bool()
         {
-            OperationCenter.Reset();
+            Reset();
 
-            var m = OperationCenter.Discover(new TestMethodInfo("fv1", "Content content, bool a", null));
+            var m = AddMethod(new TestMethodInfo("fv1", "Content content, bool a", null));
 
             // ACTION-1 strict
             var context = OperationCenter.GetMethodByRequest("fv1", @"{""a"":true}");
@@ -75,9 +88,9 @@ namespace MethodBasedOperations.Tests
         [TestMethod]
         public void GetMethodByRequest_Decimal()
         {
-            OperationCenter.Reset();
+            Reset();
 
-            var m = OperationCenter.Discover(new TestMethodInfo("fv1", "Content content, decimal a", null));
+            var m = AddMethod(new TestMethodInfo("fv1", "Content content, decimal a", null));
 
             // ACTION-1 strict
             var context = OperationCenter.GetMethodByRequest("fv1", @"{""a"":0.123456789}");
@@ -104,9 +117,9 @@ namespace MethodBasedOperations.Tests
         [TestMethod]
         public void GetMethodByRequest_Float()
         {
-            OperationCenter.Reset();
+            Reset();
 
-            var m = OperationCenter.Discover(new TestMethodInfo("fv1", "Content content, float a", null));
+            var m = AddMethod(new TestMethodInfo("fv1", "Content content, float a", null));
 
             // ACTION-1 strict
             var context = OperationCenter.GetMethodByRequest("fv1", @"{""a"":0.123456789}");
@@ -133,9 +146,9 @@ namespace MethodBasedOperations.Tests
         [TestMethod]
         public void GetMethodByRequest_Double()
         {
-            OperationCenter.Reset();
+            Reset();
 
-            var m = OperationCenter.Discover(new TestMethodInfo("fv1", "Content content, double a", null));
+            var m = AddMethod(new TestMethodInfo("fv1", "Content content, double a", null));
 
             // ACTION-1 strict
             var context = OperationCenter.GetMethodByRequest("fv1", @"{""a"":0.123456789}");
@@ -163,10 +176,10 @@ namespace MethodBasedOperations.Tests
         [TestMethod]
         public void GetMethodByRequest_Spaceship()
         {
-            OperationCenter.Reset();
+            Reset();
 
-            var m1 = OperationCenter.Discover(new TestMethodInfo("fv1", "Content content, Spaceship a", null));
-            var m2 = OperationCenter.Discover(new TestMethodInfo("fv1", "Content content, Elephant a", null));
+            var m1 = AddMethod(new TestMethodInfo("fv1", "Content content, Spaceship a", null));
+            var m2 = AddMethod(new TestMethodInfo("fv1", "Content content, Elephant a", null));
 
             // ACTION-1
             var context = OperationCenter.GetMethodByRequest("fv1",
@@ -184,10 +197,10 @@ namespace MethodBasedOperations.Tests
         [TestMethod]
         public void GetMethodByRequest_Elephant()
         {
-            OperationCenter.Reset();
+            Reset();
 
-            var m1 = OperationCenter.Discover(new TestMethodInfo("fv1", "Content content, Spaceship a", null));
-            var m2 = OperationCenter.Discover(new TestMethodInfo("fv1", "Content content, Elephant a", null));
+            var m1 = AddMethod(new TestMethodInfo("fv1", "Content content, Spaceship a", null));
+            var m2 = AddMethod(new TestMethodInfo("fv1", "Content content, Elephant a", null));
 
             // ACTION-1
             var context = OperationCenter.GetMethodByRequest("fv1", @"{""a"":{""Snout"":42, ""Height"":44}}");
@@ -205,12 +218,12 @@ namespace MethodBasedOperations.Tests
         [TestMethod]
         public void GetMethodByRequest_NotStrict_1()
         {
-            OperationCenter.Reset();
+            Reset();
 
-            var m0 = OperationCenter.Discover(new TestMethodInfo("fv0", "Content content, string a", "int x"));
-            var m1 = OperationCenter.Discover(new TestMethodInfo("fv1", "Content content, string a", "int x"));
-            var m2 = OperationCenter.Discover(new TestMethodInfo("fv1", "Content content, string a", "bool x"));
-            var m3 = OperationCenter.Discover(new TestMethodInfo("fv2", "Content content, string a", "int x"));
+            var m0 = AddMethod(new TestMethodInfo("fv0", "Content content, string a", "int x"));
+            var m1 = AddMethod(new TestMethodInfo("fv1", "Content content, string a", "int x"));
+            var m2 = AddMethod(new TestMethodInfo("fv1", "Content content, string a", "bool x"));
+            var m3 = AddMethod(new TestMethodInfo("fv2", "Content content, string a", "int x"));
 
             // ACTION-1
             var context = OperationCenter.GetMethodByRequest("fv1",
@@ -236,9 +249,9 @@ namespace MethodBasedOperations.Tests
         [ExpectedException(typeof(OperationNotFoundException))]
         public void GetMethodByRequest_NotFound_ByName()
         {
-            OperationCenter.Reset();
+            Reset();
 
-            OperationCenter.Discover(new TestMethodInfo("fv0", "Content content, string a", "int x"));
+            AddMethod(new TestMethodInfo("fv0", "Content content, string a", "int x"));
 
             // ACTION
             var context = OperationCenter.GetMethodByRequest("fv1", @"{""a"":""asdf""}");
@@ -247,9 +260,9 @@ namespace MethodBasedOperations.Tests
         [ExpectedException(typeof(OperationNotFoundException))]
         public void GetMethodByRequest_NotFound_ByRequiredParamName()
         {
-            OperationCenter.Reset();
+            Reset();
 
-            OperationCenter.Discover(new TestMethodInfo("fv0", "Content content, string a, string b", null));
+            AddMethod(new TestMethodInfo("fv0", "Content content, string a, string b", null));
 
             // ACTION
             var context = OperationCenter.GetMethodByRequest("fv0", @"{""a"":""asdf""}");
@@ -258,9 +271,9 @@ namespace MethodBasedOperations.Tests
         [ExpectedException(typeof(OperationNotFoundException))]
         public void GetMethodByRequest_NotFound_ByRequiredParamType()
         {
-            OperationCenter.Reset();
+            Reset();
 
-            OperationCenter.Discover(new TestMethodInfo("fv0", "Content content, string a, string b", null));
+            AddMethod(new TestMethodInfo("fv0", "Content content, string a, string b", null));
 
             // ACTION
             var context = OperationCenter.GetMethodByRequest("fv0", @"{""a"":""asdf"",""b"":42}");
@@ -269,12 +282,12 @@ namespace MethodBasedOperations.Tests
         [ExpectedException(typeof(AmbiguousMatchException))]
         public void GetMethodByRequest_AmbiguousMatch()
         {
-            OperationCenter.Reset();
+            Reset();
 
-            var m0 = OperationCenter.Discover(new TestMethodInfo("fv0", "Content content, string a", "int x"));
-            var m1 = OperationCenter.Discover(new TestMethodInfo("fv1", "Content content, string a", "int x"));
-            var m2 = OperationCenter.Discover(new TestMethodInfo("fv1", "Content content, string a", "string x"));
-            var m3 = OperationCenter.Discover(new TestMethodInfo("fv2", "Content content, string a", "int x"));
+            var m0 = AddMethod(new TestMethodInfo("fv0", "Content content, string a", "int x"));
+            var m1 = AddMethod(new TestMethodInfo("fv1", "Content content, string a", "int x"));
+            var m2 = AddMethod(new TestMethodInfo("fv1", "Content content, string a", "string x"));
+            var m3 = AddMethod(new TestMethodInfo("fv2", "Content content, string a", "int x"));
 
             // ACTION
             var context = OperationCenter.GetMethodByRequest("fv1", @"{""a"":""asdf""}");
@@ -283,12 +296,12 @@ namespace MethodBasedOperations.Tests
         [ExpectedException(typeof(OperationNotFoundException))]
         public void GetMethodByRequest_UnmatchedOptional()
         {
-            OperationCenter.Reset();
+            Reset();
 
-            var m0 = OperationCenter.Discover(new TestMethodInfo("fv0", "Content content, string a", "int x"));
-            var m1 = OperationCenter.Discover(new TestMethodInfo("fv1", "Content content, string a", "int x"));
-            var m2 = OperationCenter.Discover(new TestMethodInfo("fv1", "Content content, string a", "bool x"));
-            var m3 = OperationCenter.Discover(new TestMethodInfo("fv2", "Content content, string a", "int x"));
+            var m0 = AddMethod(new TestMethodInfo("fv0", "Content content, string a", "int x"));
+            var m1 = AddMethod(new TestMethodInfo("fv1", "Content content, string a", "int x"));
+            var m2 = AddMethod(new TestMethodInfo("fv1", "Content content, string a", "bool x"));
+            var m3 = AddMethod(new TestMethodInfo("fv2", "Content content, string a", "int x"));
 
             // ACTION
             var context = OperationCenter.GetMethodByRequest("fv1", @"{ ""a"":""asdf"",""x"":""asdf""}");

@@ -6,7 +6,7 @@ using SenseNet.ContentRepository;
 
 namespace MethodBasedOperations.Tests
 {
-    internal class TestMethodInfo : MethodBase
+    public class TestMethodInfo : MethodBase
     {
         private ParameterInfo[] _parameters;
         public TestMethodInfo(string name, string requiredParameters, string optionalParameters)

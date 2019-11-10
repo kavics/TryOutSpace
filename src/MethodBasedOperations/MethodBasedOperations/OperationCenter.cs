@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -8,6 +7,7 @@ using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SenseNet.ContentRepository;
+// ReSharper disable UnusedMethodReturnValue.Local
 
 namespace MethodBasedOperations
 {
@@ -16,6 +16,8 @@ namespace MethodBasedOperations
         private static readonly OperationInfo[] EmptyMethods = new OperationInfo[0];
         private static readonly Dictionary<string, OperationInfo[]> Operations =
             new Dictionary<string, OperationInfo[]>();
+        private static readonly JsonSerializer ValueDeserializer = JsonSerializer.Create(
+            new JsonSerializerSettings { MissingMemberHandling = MissingMemberHandling.Error });
 
         public static void Discover()
         {
@@ -39,19 +41,7 @@ namespace MethodBasedOperations
         }
         private static OperationInfo AddMethod(MethodBase method, Attribute[] attributes)
         {
-            if (!(attributes.Any(a => a is ODataFunctionAttribute || a is ODataActionAttribute)))
-                return null;
-
             var parameters = method.GetParameters();
-
-            if (parameters.Length == 0)
-                return null;
-            if (parameters[0].ParameterType != typeof(Content))
-                return null;
-            if (parameters[0].IsOptional)
-                return null;
-
-            parameters = parameters.Skip(1).ToArray();
             var req = parameters.Where(x => !x.IsOptional).ToArray();
             var opt = parameters.Where(x => x.IsOptional).ToArray();
             var info = new OperationInfo
@@ -61,12 +51,23 @@ namespace MethodBasedOperations
                 RequiredParameterTypes = req.Select(x => x.ParameterType).ToArray(),
                 OptionalParameterNames = opt.Select(x => x.Name).ToArray(),
                 OptionalParameterTypes = opt.Select(x => x.ParameterType).ToArray(),
+                Attributes = attributes
             };
-            AddMethod(info);
-            return info;
+            return AddMethod(info);
         }
-        private static void AddMethod(OperationInfo info)
+        private static OperationInfo AddMethod(OperationInfo info)
         {
+            if (!(info.Attributes.Any(a => a is ODataFunctionAttribute || a is ODataActionAttribute)))
+                return null;
+
+            if (info.RequiredParameterNames.Length == 0)
+                return null;
+            if (info.RequiredParameterTypes[0] != typeof(Content))
+                return null;
+
+            info.RequiredParameterNames = info.RequiredParameterNames.Skip(1).ToArray();
+            info.RequiredParameterTypes = info.RequiredParameterTypes.Skip(1).ToArray();
+
             // This is a custom dynamic array implementation. 
             // Reason: The single / overloaded method rate probably very high (a lot of single vs a few overloads).
             // Therefore the usual List<T> approach is ineffective because the most List<T> item will contain
@@ -83,6 +84,8 @@ namespace MethodBasedOperations
                 copy[copy.Length - 1] = info;
                 Operations[info.Method.Name] = copy;
             }
+
+            return info;
         }
 
         public static OperationCallingContext GetMethodByRequest(string methodName, string requestBody)
@@ -152,7 +155,7 @@ namespace MethodBasedOperations
 
                 // If parse request by parameter"s type is not successful: return false
                 var type = candidate.OptionalParameterTypes[i];
-                if (!TryParseParameter(name, type, value, strict, out var parsed))
+                if (!TryParseParameter(type, value, strict, out var parsed))
                     return false;
 
                 // Add parameter name/value to the calling context
@@ -166,7 +169,7 @@ namespace MethodBasedOperations
                 var type = candidate.RequiredParameterTypes[i];
 
                 // If parse request by parameter"s type is not successful: return false
-                if (!TryParseParameter(name, type, value, strict, out var parsed))
+                if (!TryParseParameter(type, value, strict, out var parsed))
                     return false;
 
                 // Add parameter name/value to the calling context
@@ -174,7 +177,7 @@ namespace MethodBasedOperations
             }
             return true;
         }
-        private static bool TryParseParameter(string name, Type type, JToken token, bool strict, out object parsed)
+        private static bool TryParseParameter(Type type, JToken token, bool strict, out object parsed)
         {
             if (type == GetTypeAndValue(type, token, out parsed))
                 return true;
@@ -246,8 +249,6 @@ namespace MethodBasedOperations
             parsed = null;
             return false;
         }
-        private static readonly JsonSerializer ValueDeserializer = JsonSerializer.Create(
-            new JsonSerializerSettings { MissingMemberHandling = MissingMemberHandling.Error });
         private static Type GetTypeAndValue(Type expectedType, JToken token, out object value)
         {
             switch (token.Type)
@@ -341,7 +342,7 @@ namespace MethodBasedOperations
         /// </summary>
         /// <param name="models">JSON object that will be deserialized.</param>
         /// <returns>Deserialized JObject instance.</returns>
-        private static JObject Read(string models)
+        private static JObject Read(string models) //UNDONE: Use ODataMiddleware method.
         {
             if (string.IsNullOrEmpty(models))
                 return null;

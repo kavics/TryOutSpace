@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using SenseNet.ContentRepository;
 
 namespace MethodBasedOperations
 {
@@ -6,10 +7,12 @@ namespace MethodBasedOperations
     {
         public SnAuthorizationEvaluator AuthorizationEvaluator { get; set; } = SnAuthorizationEvaluator.Default;
 
+        public Content Content { get; }
         public OperationInfo Operation { get; }
 
-        public OperationCallingContext(OperationInfo info)
+        public OperationCallingContext(Content content, OperationInfo info)
         {
+            Content = content;
             Operation = info;
         }
 

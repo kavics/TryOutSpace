@@ -44,7 +44,7 @@ namespace MethodBasedOperations.Tests
             // ACTION
             object result;
             using (new AuthorizationEvaluatorSwindler(context, new AllowEverything()))
-                result = OperationCenter.Invoke(new Content(), context);
+                result = OperationCenter.Invoke(context);
 
             // ASSERT
             var objects = (object[])result;
@@ -66,7 +66,7 @@ namespace MethodBasedOperations.Tests
             var context = OperationCenter.GetMethodByRequest(GetContent(), "Op2", @"{""dummy"":0}");
             object result;
             using (new AuthorizationEvaluatorSwindler(context, new AllowEverything()))
-                result = OperationCenter.Invoke(new Content(), context);
+                result = OperationCenter.Invoke(context);
             // ASSERT
             var objects = (object[]) result;
             Assert.AreEqual(null, objects[0]);
@@ -79,7 +79,7 @@ namespace MethodBasedOperations.Tests
             // ACTION
             context = OperationCenter.GetMethodByRequest(GetContent(), "Op2", @"{""a"":""testvalue""}");
             using (new AuthorizationEvaluatorSwindler(context, new AllowEverything()))
-                result = OperationCenter.Invoke(new Content(), context);
+                result = OperationCenter.Invoke(context);
             // ASSERT
             objects = (object[])result;
             Assert.AreEqual("testvalue", objects[0]);
@@ -92,7 +92,7 @@ namespace MethodBasedOperations.Tests
             // ACTION
             context = OperationCenter.GetMethodByRequest(GetContent(), "Op2", @"{""b"":42}");
             using (new AuthorizationEvaluatorSwindler(context, new AllowEverything()))
-                result = OperationCenter.Invoke(new Content(), context);
+                result = OperationCenter.Invoke(context);
             // ASSERT
             objects = (object[])result;
             Assert.AreEqual(null, objects[0]);
@@ -105,7 +105,7 @@ namespace MethodBasedOperations.Tests
             // ACTION
             context = OperationCenter.GetMethodByRequest(GetContent(), "Op2", @"{""c"":true}");
             using (new AuthorizationEvaluatorSwindler(context, new AllowEverything()))
-                result = OperationCenter.Invoke(new Content(), context);
+                result = OperationCenter.Invoke(context);
             // ASSERT
             objects = (object[])result;
             Assert.AreEqual(null, objects[0]);
@@ -118,7 +118,7 @@ namespace MethodBasedOperations.Tests
             // ACTION
             context = OperationCenter.GetMethodByRequest(GetContent(), "Op2", @"{""d"":12.345}");
             using (new AuthorizationEvaluatorSwindler(context, new AllowEverything()))
-                result = OperationCenter.Invoke(new Content(), context);
+                result = OperationCenter.Invoke(context);
             // ASSERT
             objects = (object[])result;
             Assert.AreEqual(null, objects[0]);
@@ -131,7 +131,7 @@ namespace MethodBasedOperations.Tests
             // ACTION
             context = OperationCenter.GetMethodByRequest(GetContent(), "Op2", @"{""e"":12.345}");
             using (new AuthorizationEvaluatorSwindler(context, new AllowEverything()))
-                result = OperationCenter.Invoke(new Content(), context);
+                result = OperationCenter.Invoke(context);
             // ASSERT
             objects = (object[])result;
             Assert.AreEqual(null, objects[0]);
@@ -144,7 +144,7 @@ namespace MethodBasedOperations.Tests
             // ACTION
             context = OperationCenter.GetMethodByRequest(GetContent(), "Op2", @"{""f"":12.345}");
             using (new AuthorizationEvaluatorSwindler(context, new AllowEverything()))
-                result = OperationCenter.Invoke(new Content(), context);
+                result = OperationCenter.Invoke(context);
             // ASSERT
             objects = (object[])result;
             Assert.AreEqual(null, objects[0]);
@@ -166,7 +166,7 @@ namespace MethodBasedOperations.Tests
             var context = OperationCenter.GetMethodByRequest(GetContent(), "Op3", @"{""dummy"":1}");
             using (new AuthorizationEvaluatorSwindler(context, new AllowEverything()))
             {
-                var result = OperationCenter.Invoke(new Content(), context);
+                var result = OperationCenter.Invoke(context);
                 // ASSERT
                 Assert.AreEqual("Called", result);
             }
@@ -185,7 +185,7 @@ namespace MethodBasedOperations.Tests
             // ACTION
             object result;
             using (new AuthorizationEvaluatorSwindler(context, new AllowEverything()))
-                result = OperationCenter.Invoke(new Content(), context);
+                result = OperationCenter.Invoke(context);
 
             // ASSERT
             var objects = (object[])result;
@@ -208,7 +208,7 @@ namespace MethodBasedOperations.Tests
             // ACTION
             object result;
             using (new AuthorizationEvaluatorSwindler(context, new AllowEverything()))
-                result = OperationCenter.Invoke(new Content(), context);
+                result = OperationCenter.Invoke(context);
 
             // ASSERT
             var objects = (object[])result;

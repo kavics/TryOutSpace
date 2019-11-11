@@ -107,14 +107,14 @@ namespace MethodBasedOperations
             // Phase-1: search complete type match (strict)
             var contexts = new List<OperationCallingContext>();
             foreach(var candidate in candidates)
-                if (TryParseParameters(candidate, requestParameters, true, out var context))
+                if (TryParseParameters(candidate, content, requestParameters, true, out var context))
                     contexts.Add(context);
 
             if (contexts.Count == 0)
             {
                 // Phase-2: search convertible type match
                 foreach (var candidate in candidates)
-                    if (TryParseParameters(candidate, requestParameters, false, out var context))
+                    if (TryParseParameters(candidate, content, requestParameters, false, out var context))
                         contexts.Add(context);
             }
 
@@ -147,9 +147,9 @@ namespace MethodBasedOperations
                     return false;
             return true;
         }
-        private static bool TryParseParameters(OperationInfo candidate, JObject requestParameters, bool strict, out OperationCallingContext context)
+        private static bool TryParseParameters(OperationInfo candidate, Content content, JObject requestParameters, bool strict, out OperationCallingContext context)
         {
-            context = new OperationCallingContext(candidate);
+            context = new OperationCallingContext(content, candidate);
 
             // Foreach all optional parameters of the method
             for (int i = 0; i < candidate.OptionalParameterNames.Length; i++)
@@ -329,17 +329,17 @@ namespace MethodBasedOperations
             return string.Join(", ", contexts.Select(c => c.Operation.ToString()));
         }
 
-        public static object Invoke(Content content, OperationCallingContext context)
+        public static object Invoke(OperationCallingContext context)
         {
             var method = context.Operation.Method;
             var methodParams = method.GetParameters();
             var paramValues = new object[methodParams.Length];
-            paramValues[0] = content;
+            paramValues[0] = context.Content;
             for (int i = 1; i < methodParams.Length; i++)
                 if (!context.Parameters.TryGetValue(methodParams[i].Name, out paramValues[i]))
                     paramValues[i] = methodParams[i].DefaultValue;
 
-            if(context.AuthorizationEvaluator.Evaluate(content, User.Current, context))
+            if(context.AuthorizationEvaluator.Evaluate(context.Content, User.Current, context))
                 return method.Invoke(null, paramValues);
 
             throw new UnauthorizedAccessException(); //UNDONE:? 404, 503?

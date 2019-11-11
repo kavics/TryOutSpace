@@ -44,14 +44,12 @@ namespace MethodBasedOperations
             var parameters = method.GetParameters();
             var req = parameters.Where(x => !x.IsOptional).ToArray();
             var opt = parameters.Where(x => x.IsOptional).ToArray();
-            var info = new OperationInfo
+            var info = new OperationInfo(method, attributes)
             {
-                Method = method,
                 RequiredParameterNames = req.Select(x => x.Name).ToArray(),
                 RequiredParameterTypes = req.Select(x => x.ParameterType).ToArray(),
                 OptionalParameterNames = opt.Select(x => x.Name).ToArray(),
                 OptionalParameterTypes = opt.Select(x => x.ParameterType).ToArray(),
-                Attributes = attributes
             };
             return AddMethod(info);
         }
@@ -98,6 +96,8 @@ namespace MethodBasedOperations
 
             var candidates = GetCandidatesByName(methodName);
             candidates = candidates.Where(x => AllRequiredParametersExist(x, requestParameterNames)).ToArray();
+
+//UNDONE:!!!! Check ContentTypes, required permissions (need requested content).
 
             // If there is no any candidates, throw: Operation not found ERROR
             if (candidates.Length == 0)

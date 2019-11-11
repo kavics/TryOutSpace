@@ -20,19 +20,33 @@ namespace MethodBasedOperations.Tests
     public class TestOperations
     {
         [ODataFunction]
-        [RequiredPermissions("See, Run")]
-        [SnAuthorize(roles: "Administrators,Editors")]
+        [RequiredPermission("See, Run")]
+        [SnAuthorize(Role = "Administrators,Editors")]
+        [Scenario("Scenario1, Scenario2")]
+        [Scenario(Scenario = "Scenario2, Scenario3")]
         public static object[] Op1(Content content,
             string a, int b, bool c, float d, decimal e, double f)
         {
             return new object[] { a, b, c, d, e, f };
         }
-        [ODataFunction]
-        [RequiredPermissions("P1, P2")]
+
+        [ODataAction]
+        [SnAuthorize(Policy = "Policy1")]
+        [RequiredPermission("P1, P2")]
+        [RequiredPermission(Permission = "P3")]
+        [ContentType("User, Group")]
+        [ContentType(ContentTypeName = "OrgUnit")]
         public static object[] Op2(Content content,
             string a = null, int b = 0, bool c = false, float d = 0f, decimal e = 0m, double f = 0d)
         {
             return new object[] { a, b, c, d, e, f };
+        }
+
+        [ODataFunction]
+        [SnAuthorize("Policy2")]
+        public static string Op3(Content content)
+        {
+            return "Called";
         }
     }
 }

@@ -4,7 +4,10 @@ namespace MethodBasedOperations
 {
     public class OperationCallingContext
     {
+        public SnAuthorizationEvaluator AuthorizationEvaluator { get; set; } = SnAuthorizationEvaluator.Default;
+
         public OperationInfo Operation { get; }
+
         public OperationCallingContext(OperationInfo info)
         {
             Operation = info;

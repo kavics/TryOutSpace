@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace MethodBasedOperations
 {
     [Serializable]
-    public class SnNotSupportedException : Exception //UNDONE: Delete this class
+    public class SnNotSupportedException : Exception //UNDONE: MOCK: Delete this class
     {
         public SnNotSupportedException()
         {

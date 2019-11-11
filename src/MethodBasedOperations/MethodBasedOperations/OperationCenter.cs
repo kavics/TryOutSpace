@@ -332,7 +332,10 @@ namespace MethodBasedOperations
                 if (!context.Parameters.TryGetValue(methodParams[i].Name, out paramValues[i]))
                     paramValues[i] = methodParams[i].DefaultValue;
 
-            return method.Invoke(null, paramValues);
+            if(context.AuthorizationEvaluator.Evaluate(content, User.Current, context))
+                return method.Invoke(null, paramValues);
+
+            throw new UnauthorizedAccessException(); //UNDONE:? 404, 503?
         }
 
         /* ====================================================================== */
@@ -342,7 +345,7 @@ namespace MethodBasedOperations
         /// </summary>
         /// <param name="models">JSON object that will be deserialized.</param>
         /// <returns>Deserialized JObject instance.</returns>
-        private static JObject Read(string models) //UNDONE: Use ODataMiddleware method.
+        private static JObject Read(string models) //UNDONE: Use the existing ODataMiddleware method.
         {
             if (string.IsNullOrEmpty(models))
                 return null;

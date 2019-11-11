@@ -86,18 +86,18 @@ namespace MethodBasedOperations
             return info;
         }
 
-        public static OperationCallingContext GetMethodByRequest(string methodName, string requestBody)
+        public static OperationCallingContext GetMethodByRequest(Content content, string methodName, string requestBody)
         {
-            return GetMethodByRequest(methodName, Read(requestBody));
+            return GetMethodByRequest(content, methodName, Read(requestBody));
         }
-        private static OperationCallingContext GetMethodByRequest(string methodName, JObject requestParameters)
+        private static OperationCallingContext GetMethodByRequest(Content content, string methodName, JObject requestParameters)
         {
             var requestParameterNames = requestParameters.Properties().Select(p => p.Name).ToArray();
 
             var candidates = GetCandidatesByName(methodName);
             candidates = candidates.Where(x => AllRequiredParametersExist(x, requestParameterNames)).ToArray();
 
-//UNDONE:!!!! Check ContentTypes, required permissions (need requested content).
+            candidates = candidates.Where(x => CheckRelevantContentTypes(x.ContentTypes, content.ContentType.Name)).ToArray();
 
             // If there is no any candidates, throw: Operation not found ERROR
             if (candidates.Length == 0)
@@ -125,6 +125,13 @@ namespace MethodBasedOperations
                 throw new AmbiguousMatchException($"Ambiguous call: {GetRequestSignature(methodName, requestParameterNames)} --> {GetMethodSignatures(contexts)}");
 
             return contexts[0];
+        }
+
+        private static bool CheckRelevantContentTypes(string[] allowedContentTypes, string currentContentType)
+        {
+            if (allowedContentTypes.Length == 0)
+                return true;
+            return allowedContentTypes.Contains(currentContentType);
         }
 
         private static OperationInfo[] GetCandidatesByName(string methodName)

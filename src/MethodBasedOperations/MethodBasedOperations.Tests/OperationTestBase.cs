@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using MethodBasedOperations.Tests.Accessors;
+using SenseNet.ContentRepository;
 
 namespace MethodBasedOperations.Tests
 {
@@ -23,5 +24,11 @@ namespace MethodBasedOperations.Tests
         {
             return (OperationInfo)OperationCenterAccessor.InvokeStatic("AddMethod", method, _defaultAttributes);
         }
+
+        protected Content GetContent(string contentTypeName = null)
+        {
+            return new Content { ContentType = new ContentType { Name = contentTypeName ?? "GenericContent" } };
+        }
+
     }
 }

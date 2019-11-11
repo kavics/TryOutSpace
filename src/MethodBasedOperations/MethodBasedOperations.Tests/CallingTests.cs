@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection.Metadata.Ecma335;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SenseNet.ContentRepository;
 
@@ -37,7 +38,7 @@ namespace MethodBasedOperations.Tests
             Reset();
 
             AddMethod(typeof(TestOperations).GetMethod("Op1"));
-            var context = OperationCenter.GetMethodByRequest("Op1",
+            var context = OperationCenter.GetMethodByRequest(GetContent("User"), "Op1",
                 @"{""a"":""asdf"", ""b"":42, ""c"":true, ""d"":0.12, ""e"":0.13, ""f"":0.14}");
 
             // ACTION
@@ -62,7 +63,7 @@ namespace MethodBasedOperations.Tests
             AddMethod(typeof(TestOperations).GetMethod("Op2"));
 
             // ACTION
-            var context = OperationCenter.GetMethodByRequest("Op2", @"{""dummy"":0}");
+            var context = OperationCenter.GetMethodByRequest(GetContent(), "Op2", @"{""dummy"":0}");
             object result;
             using (new AuthorizationEvaluatorSwindler(context, new AllowEverything()))
                 result = OperationCenter.Invoke(new Content(), context);
@@ -76,7 +77,7 @@ namespace MethodBasedOperations.Tests
             Assert.AreEqual(0.0d, objects[5]);
 
             // ACTION
-            context = OperationCenter.GetMethodByRequest("Op2", @"{""a"":""testvalue""}");
+            context = OperationCenter.GetMethodByRequest(GetContent(), "Op2", @"{""a"":""testvalue""}");
             using (new AuthorizationEvaluatorSwindler(context, new AllowEverything()))
                 result = OperationCenter.Invoke(new Content(), context);
             // ASSERT
@@ -89,7 +90,7 @@ namespace MethodBasedOperations.Tests
             Assert.AreEqual(0.0d, objects[5]);
 
             // ACTION
-            context = OperationCenter.GetMethodByRequest("Op2", @"{""b"":42}");
+            context = OperationCenter.GetMethodByRequest(GetContent(), "Op2", @"{""b"":42}");
             using (new AuthorizationEvaluatorSwindler(context, new AllowEverything()))
                 result = OperationCenter.Invoke(new Content(), context);
             // ASSERT
@@ -102,7 +103,7 @@ namespace MethodBasedOperations.Tests
             Assert.AreEqual(0.0d, objects[5]);
 
             // ACTION
-            context = OperationCenter.GetMethodByRequest("Op2", @"{""c"":true}");
+            context = OperationCenter.GetMethodByRequest(GetContent(), "Op2", @"{""c"":true}");
             using (new AuthorizationEvaluatorSwindler(context, new AllowEverything()))
                 result = OperationCenter.Invoke(new Content(), context);
             // ASSERT
@@ -115,7 +116,7 @@ namespace MethodBasedOperations.Tests
             Assert.AreEqual(0.0d, objects[5]);
 
             // ACTION
-            context = OperationCenter.GetMethodByRequest("Op2", @"{""d"":12.345}");
+            context = OperationCenter.GetMethodByRequest(GetContent(), "Op2", @"{""d"":12.345}");
             using (new AuthorizationEvaluatorSwindler(context, new AllowEverything()))
                 result = OperationCenter.Invoke(new Content(), context);
             // ASSERT
@@ -128,7 +129,7 @@ namespace MethodBasedOperations.Tests
             Assert.AreEqual(0.0d, objects[5]);
 
             // ACTION
-            context = OperationCenter.GetMethodByRequest("Op2", @"{""e"":12.345}");
+            context = OperationCenter.GetMethodByRequest(GetContent(), "Op2", @"{""e"":12.345}");
             using (new AuthorizationEvaluatorSwindler(context, new AllowEverything()))
                 result = OperationCenter.Invoke(new Content(), context);
             // ASSERT
@@ -141,7 +142,7 @@ namespace MethodBasedOperations.Tests
             Assert.AreEqual(0.0d, objects[5]);
 
             // ACTION
-            context = OperationCenter.GetMethodByRequest("Op2", @"{""f"":12.345}");
+            context = OperationCenter.GetMethodByRequest(GetContent(), "Op2", @"{""f"":12.345}");
             using (new AuthorizationEvaluatorSwindler(context, new AllowEverything()))
                 result = OperationCenter.Invoke(new Content(), context);
             // ASSERT
@@ -162,7 +163,7 @@ namespace MethodBasedOperations.Tests
             AddMethod(typeof(TestOperations).GetMethod("Op3"));
 
             // ACTION
-            var context = OperationCenter.GetMethodByRequest("Op3", @"{""dummy"":1}");
+            var context = OperationCenter.GetMethodByRequest(GetContent(), "Op3", @"{""dummy"":1}");
             using (new AuthorizationEvaluatorSwindler(context, new AllowEverything()))
             {
                 var result = OperationCenter.Invoke(new Content(), context);
@@ -178,7 +179,7 @@ namespace MethodBasedOperations.Tests
             Reset();
 
             AddMethod(typeof(TestOperations).GetMethod("Op1"));
-            var context = OperationCenter.GetMethodByRequest("Op1",
+            var context = OperationCenter.GetMethodByRequest(GetContent("User"), "Op1",
                 @"{""a"":null, ""b"":null, ""c"":null, ""d"":null, ""e"":null, ""f"":null}");
 
             // ACTION
@@ -201,7 +202,7 @@ namespace MethodBasedOperations.Tests
             Reset();
 
             AddMethod(typeof(TestOperations).GetMethod("Op1"));
-            var context = OperationCenter.GetMethodByRequest("Op1",
+            var context = OperationCenter.GetMethodByRequest(GetContent("User"), "Op1",
                 @"{""a"":undefined, ""b"":undefined, ""c"":undefined, ""d"":undefined, ""e"":undefined, ""f"":undefined}");
 
             // ACTION

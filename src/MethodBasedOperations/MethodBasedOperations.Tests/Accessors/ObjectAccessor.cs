@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 // ReSharper disable UnusedParameter.Local
@@ -6,6 +7,7 @@ using System.Reflection;
 // ReSharper disable once CheckNamespace
 namespace MethodBasedOperations.Tests.Accessors
 {
+    [ExcludeFromCodeCoverage]
     public class ObjectAccessor
     {
         private Type _targetType;

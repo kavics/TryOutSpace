@@ -43,8 +43,8 @@ namespace MethodBasedOperations
                 .Select(a => ((RequiredPermissionAttribute)a).Permission));
 
             Scenarios = ParseNames(attributes
-                .Where(a => a is RequiredPermissionAttribute)
-                .Select(a => ((RequiredPermissionAttribute)a).Permission));
+                .Where(a => a is ScenarioAttribute)
+                .Select(a => ((ScenarioAttribute)a).Scenario));
 
             var snAuthorizeAttributes = attributes.Where(a => a is SnAuthorizeAttribute).Cast<SnAuthorizeAttribute>().ToArray();
             Roles = ParseNames(snAuthorizeAttributes.Select(a => a.Role));

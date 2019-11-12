@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 
 namespace MethodBasedOperations
 {
     [Serializable]
+    [ExcludeFromCodeCoverage]
     public class OperationNotFoundException : Exception
     {
         public OperationNotFoundException()

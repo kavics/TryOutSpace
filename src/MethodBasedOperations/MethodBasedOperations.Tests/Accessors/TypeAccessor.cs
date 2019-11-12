@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 
 // ReSharper disable once CheckNamespace
 namespace MethodBasedOperations.Tests.Accessors
 {
+    [ExcludeFromCodeCoverage]
     public class TypeAccessor
     {
         private BindingFlags _publicFlags = BindingFlags.Static | BindingFlags.Public;

@@ -95,9 +95,11 @@ namespace MethodBasedOperations
             var requestParameterNames = requestParameters.Properties().Select(p => p.Name).ToArray();
 
             var candidates = GetCandidatesByName(methodName);
-            candidates = candidates.Where(x => AllRequiredParametersExist(x, requestParameterNames)).ToArray();
 
-            candidates = candidates.Where(x => CheckRelevantContentTypes(x.ContentTypes, content.ContentType.Name)).ToArray();
+            //UNDONE: concatenate where clauses before freeze the feature.
+            candidates = candidates.Where(x => AllRequiredParametersExist(x, requestParameterNames)).ToArray();
+            candidates = candidates.Where(x => FilterByContentTypes(x.ContentTypes, content.ContentType.Name)).ToArray();
+            candidates = candidates.Where(x => FilterByRolesAndPermissions(x.Roles, x.RequiredPermissions, content, User.Current)).ToArray();
 
             // If there is no any candidates, throw: Operation not found ERROR
             if (candidates.Length == 0)
@@ -127,11 +129,17 @@ namespace MethodBasedOperations
             return contexts[0];
         }
 
-        private static bool CheckRelevantContentTypes(string[] allowedContentTypes, string currentContentType)
+        private static bool FilterByContentTypes(string[] allowedContentTypes, string currentContentType)
         {
             if (allowedContentTypes.Length == 0)
                 return true;
             return allowedContentTypes.Contains(currentContentType);
+        }
+        private static bool FilterByRolesAndPermissions(string[] roles, string[] permissions, Content content, User user)
+        {
+            if (roles.Length > 0 && !OperationInspector.Instance.CheckByRoles(user, roles))
+                return false;
+            return OperationInspector.Instance.CheckByPermissions(content, user, permissions);
         }
 
         private static OperationInfo[] GetCandidatesByName(string methodName)
@@ -339,7 +347,7 @@ namespace MethodBasedOperations
                 if (!context.Parameters.TryGetValue(methodParams[i].Name, out paramValues[i]))
                     paramValues[i] = methodParams[i].DefaultValue;
 
-            if(context.AuthorizationEvaluator.Evaluate(context.Content, User.Current, context))
+            if(OperationInspector.Instance.CheckBeforeInvoke(User.Current, context))
                 return method.Invoke(null, paramValues);
 
             throw new UnauthorizedAccessException(); //UNDONE:? 404, 503?

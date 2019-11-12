@@ -35,7 +35,9 @@ namespace MethodBasedOperations.Tests
             var m3 = AddMethod(new TestMethodInfo("fv2", "Content content, string a", "int x"));
 
             // ACTION
-            var context = OperationCenter.GetMethodByRequest(GetContent(), "fv1",
+            OperationCallingContext context;
+            using (new OperationInspectorSwindler(new AllowEverything()))
+                context = OperationCenter.GetMethodByRequest(GetContent(), "fv1",
                 @"{""a"":""asdf"",""b"":""qwer"",""y"":12,""x"":42}");
 
             // ASSERT
@@ -55,8 +57,10 @@ namespace MethodBasedOperations.Tests
             var m3 = AddMethod(new TestMethodInfo("fv2", "Content content, string a", "int x"));
 
             // ACTION
-            var context = OperationCenter.GetMethodByRequest(GetContent(), "fv1",
-                @"{""a"":""asdf"",""b"":""qwer"",""y"":12,""x"":""42"" }");
+            OperationCallingContext context;
+            using (new OperationInspectorSwindler(new AllowEverything()))
+                context = OperationCenter.GetMethodByRequest(GetContent(), "fv1",
+                    @"{""a"":""asdf"",""b"":""qwer"",""y"":12,""x"":""42"" }");
 
             // ASSERT
             Assert.AreEqual(m2, context.Operation);
@@ -72,14 +76,17 @@ namespace MethodBasedOperations.Tests
             var m = AddMethod(new TestMethodInfo("fv1", "Content content, bool a", null));
 
             // ACTION-1 strict
-            var context = OperationCenter.GetMethodByRequest(GetContent(), "fv1", @"{""a"":true}");
+            OperationCallingContext context;
+            using (new OperationInspectorSwindler(new AllowEverything()))
+                context = OperationCenter.GetMethodByRequest(GetContent(), "fv1", @"{""a"":true}");
             // ASSERT
             Assert.AreEqual(m, context.Operation);
             Assert.AreEqual(1, context.Parameters.Count);
             Assert.AreEqual(true, context.Parameters["a"]);
 
             // ACTION not strict
-            context = OperationCenter.GetMethodByRequest(GetContent(), "fv1", @"{""a"":""true""}");
+            using (new OperationInspectorSwindler(new AllowEverything()))
+                context = OperationCenter.GetMethodByRequest(GetContent(), "fv1", @"{""a"":""true""}");
             // ASSERT
             Assert.AreEqual(m, context.Operation);
             Assert.AreEqual(1, context.Parameters.Count);
@@ -93,7 +100,9 @@ namespace MethodBasedOperations.Tests
             var m = AddMethod(new TestMethodInfo("fv1", "Content content, decimal a", null));
 
             // ACTION-1 strict
-            var context = OperationCenter.GetMethodByRequest(GetContent(), "fv1", @"{""a"":0.123456789}");
+            OperationCallingContext context;
+            using (new OperationInspectorSwindler(new AllowEverything()))
+                context = OperationCenter.GetMethodByRequest(GetContent(), "fv1", @"{""a"":0.123456789}");
             // ASSERT
             Assert.AreEqual(m, context.Operation);
             Assert.AreEqual(1, context.Parameters.Count);
@@ -101,14 +110,16 @@ namespace MethodBasedOperations.Tests
 
             // ACTION not strict, localized
             Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("hu-hu");
-            context = OperationCenter.GetMethodByRequest(GetContent(), "fv1", @"{""a"":""0,123456789""}");
+            using (new OperationInspectorSwindler(new AllowEverything()))
+                context = OperationCenter.GetMethodByRequest(GetContent(), "fv1", @"{""a"":""0,123456789""}");
             // ASSERT
             Assert.AreEqual(m, context.Operation);
             Assert.AreEqual(1, context.Parameters.Count);
             Assert.AreEqual(0.123456789m, context.Parameters["a"]);
 
             // ACTION not strict, globalized
-            context = OperationCenter.GetMethodByRequest(GetContent(), "fv1", @"{""a"":""0.123456789""}");
+            using (new OperationInspectorSwindler(new AllowEverything()))
+                context = OperationCenter.GetMethodByRequest(GetContent(), "fv1", @"{""a"":""0.123456789""}");
             // ASSERT
             Assert.AreEqual(m, context.Operation);
             Assert.AreEqual(1, context.Parameters.Count);
@@ -122,7 +133,9 @@ namespace MethodBasedOperations.Tests
             var m = AddMethod(new TestMethodInfo("fv1", "Content content, float a", null));
 
             // ACTION-1 strict
-            var context = OperationCenter.GetMethodByRequest(GetContent(), "fv1", @"{""a"":0.123456789}");
+            OperationCallingContext context;
+            using (new OperationInspectorSwindler(new AllowEverything()))
+                context = OperationCenter.GetMethodByRequest(GetContent(), "fv1", @"{""a"":0.123456789}");
             // ASSERT
             Assert.AreEqual(m, context.Operation);
             Assert.AreEqual(1, context.Parameters.Count);
@@ -130,14 +143,16 @@ namespace MethodBasedOperations.Tests
 
             // ACTION not strict, localized
             Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("hu-hu");
-            context = OperationCenter.GetMethodByRequest(GetContent(), "fv1", @"{""a"":""0,123456789""}");
+            using (new OperationInspectorSwindler(new AllowEverything()))
+                context = OperationCenter.GetMethodByRequest(GetContent(), "fv1", @"{""a"":""0,123456789""}");
             // ASSERT
             Assert.AreEqual(m, context.Operation);
             Assert.AreEqual(1, context.Parameters.Count);
             Assert.AreEqual(0.123456789f, context.Parameters["a"]);
 
             // ACTION not strict, globalized
-            context = OperationCenter.GetMethodByRequest(GetContent(), "fv1", @"{""a"":""0.123456789""}");
+            using (new OperationInspectorSwindler(new AllowEverything()))
+                context = OperationCenter.GetMethodByRequest(GetContent(), "fv1", @"{""a"":""0.123456789""}");
             // ASSERT
             Assert.AreEqual(m, context.Operation);
             Assert.AreEqual(1, context.Parameters.Count);
@@ -151,7 +166,9 @@ namespace MethodBasedOperations.Tests
             var m = AddMethod(new TestMethodInfo("fv1", "Content content, double a", null));
 
             // ACTION-1 strict
-            var context = OperationCenter.GetMethodByRequest(GetContent(), "fv1", @"{""a"":0.123456789}");
+            OperationCallingContext context;
+            using (new OperationInspectorSwindler(new AllowEverything()))
+                context = OperationCenter.GetMethodByRequest(GetContent(), "fv1", @"{""a"":0.123456789}");
             // ASSERT
             Assert.AreEqual(m, context.Operation);
             Assert.AreEqual(1, context.Parameters.Count);
@@ -159,14 +176,16 @@ namespace MethodBasedOperations.Tests
 
             // ACTION not strict, localized
             Thread.CurrentThread.CurrentCulture = CultureInfo.GetCultureInfo("hu-hu");
-            context = OperationCenter.GetMethodByRequest(GetContent(), "fv1", @"{""a"":""0,123456789""}");
+            using (new OperationInspectorSwindler(new AllowEverything()))
+                context = OperationCenter.GetMethodByRequest(GetContent(), "fv1", @"{""a"":""0,123456789""}");
             // ASSERT
             Assert.AreEqual(m, context.Operation);
             Assert.AreEqual(1, context.Parameters.Count);
             Assert.AreEqual(0.123456789d, context.Parameters["a"]);
 
             // ACTION not strict, globalized
-            context = OperationCenter.GetMethodByRequest(GetContent(), "fv1", @"{""a"":""0.123456789""}");
+            using (new OperationInspectorSwindler(new AllowEverything()))
+                context = OperationCenter.GetMethodByRequest(GetContent(), "fv1", @"{""a"":""0.123456789""}");
             // ASSERT
             Assert.AreEqual(m, context.Operation);
             Assert.AreEqual(1, context.Parameters.Count);
@@ -182,8 +201,10 @@ namespace MethodBasedOperations.Tests
             var m2 = AddMethod(new TestMethodInfo("fv1", "Content content, Elephant a", null));
 
             // ACTION-1
-            var context = OperationCenter.GetMethodByRequest(GetContent(), "fv1",
-                @"{""a"":{""Name"":""Space Bender 8"", ""Class"":""Big F Vehicle"", ""Length"":444}}");
+            OperationCallingContext context;
+            using (new OperationInspectorSwindler(new AllowEverything()))
+                context = OperationCenter.GetMethodByRequest(GetContent(), "fv1",
+                    @"{""a"":{""Name"":""Space Bender 8"", ""Class"":""Big F Vehicle"", ""Length"":444}}");
 
             // ASSERT
             Assert.AreEqual(m1, context.Operation);
@@ -203,7 +224,9 @@ namespace MethodBasedOperations.Tests
             var m2 = AddMethod(new TestMethodInfo("fv1", "Content content, Elephant a", null));
 
             // ACTION-1
-            var context = OperationCenter.GetMethodByRequest(GetContent(), "fv1", @"{""a"":{""Snout"":42, ""Height"":44}}");
+            OperationCallingContext context;
+            using (new OperationInspectorSwindler(new AllowEverything()))
+                context = OperationCenter.GetMethodByRequest(GetContent(), "fv1", @"{""a"":{""Snout"":42, ""Height"":44}}");
 
             // ASSERT
             Assert.AreEqual(m2, context.Operation);
@@ -226,8 +249,10 @@ namespace MethodBasedOperations.Tests
             var m3 = AddMethod(new TestMethodInfo("fv2", "Content content, string a", "int x"));
 
             // ACTION-1
-            var context = OperationCenter.GetMethodByRequest(GetContent(), "fv1",
-                @"{""a"":""asdf"",""b"":""qwer"",""y"":12,""x"":""42""}");
+            OperationCallingContext context;
+            using (new OperationInspectorSwindler(new AllowEverything()))
+                context = OperationCenter.GetMethodByRequest(GetContent(), "fv1",
+                    @"{""a"":""asdf"",""b"":""qwer"",""y"":12,""x"":""42""}");
 
             // ASSERT-1
             Assert.AreEqual(m1, context.Operation);
@@ -236,8 +261,9 @@ namespace MethodBasedOperations.Tests
             Assert.AreEqual(42, context.Parameters["x"]);
 
             // ACTION-2
-            context = OperationCenter.GetMethodByRequest(GetContent(), "fv1",
-                @"{ ""a"":""asdf"",""b"":""qwer"",""y"":12,""x"":""true""}");
+            using (new OperationInspectorSwindler(new AllowEverything()))
+                context = OperationCenter.GetMethodByRequest(GetContent(), "fv1",
+                    @"{ ""a"":""asdf"",""b"":""qwer"",""y"":12,""x"":""true""}");
 
             // ASSERT-2
             Assert.AreEqual(m2, context.Operation);
@@ -290,7 +316,9 @@ namespace MethodBasedOperations.Tests
             var m3 = AddMethod(new TestMethodInfo("fv2", "Content content, string a", "int x"));
 
             // ACTION
-            var context = OperationCenter.GetMethodByRequest(GetContent(), "fv1", @"{""a"":""asdf""}");
+            OperationCallingContext context;
+            using (new OperationInspectorSwindler(new AllowEverything()))
+                context = OperationCenter.GetMethodByRequest(GetContent(), "fv1", @"{""a"":""asdf""}");
         }
         [TestMethod]
         [ExpectedException(typeof(OperationNotFoundException))]

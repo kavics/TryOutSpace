@@ -5,8 +5,6 @@ namespace MethodBasedOperations
 {
     public class OperationCallingContext
     {
-        public SnAuthorizationEvaluator AuthorizationEvaluator { get; set; } = SnAuthorizationEvaluator.Default;
-
         public Content Content { get; }
         public OperationInfo Operation { get; }
 

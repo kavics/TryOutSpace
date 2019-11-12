@@ -11,7 +11,7 @@ namespace MethodBasedOperations.Tests
     {
 
         [TestMethod]
-        public void MBO_GetInfo_0Prm()
+        public void OD_MBO_GetInfo_0Prm()
         {
             var method = new TestMethodInfo("fv1", null, null);
 
@@ -20,7 +20,7 @@ namespace MethodBasedOperations.Tests
             Assert.IsNull(info);
         }
         [TestMethod]
-        public void MBO_GetInfo_1Prm_Invalid()
+        public void OD_MBO_GetInfo_1Prm_Invalid()
         {
             var method = new TestMethodInfo("fv1", "string a", null);
 
@@ -29,7 +29,7 @@ namespace MethodBasedOperations.Tests
             Assert.IsNull(info);
         }
         [TestMethod]
-        public void MBO_GetInfo_1Prm_Optional()
+        public void OD_MBO_GetInfo_1Prm_Optional()
         {
             var method = new TestMethodInfo("fv1", null, "Content content");
 
@@ -38,7 +38,7 @@ namespace MethodBasedOperations.Tests
             Assert.IsNull(info);
         }
         [TestMethod]
-        public void MBO_GetInfo_1Prm()
+        public void OD_MBO_GetInfo_1Prm()
         {
             var method = new TestMethodInfo("fv1", "Content content", null);
 
@@ -50,7 +50,7 @@ namespace MethodBasedOperations.Tests
             Assert.AreEqual(0, info.OptionalParameterTypes.Length);
         }
         [TestMethod]
-        public void MBO_GetInfo_5Prm2()
+        public void OD_MBO_GetInfo_5Prm2()
         {
             var method = new TestMethodInfo("fv1", "Content content, string a, int b", "string c, DateTime d");
 

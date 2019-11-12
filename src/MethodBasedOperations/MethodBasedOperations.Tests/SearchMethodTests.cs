@@ -14,18 +14,18 @@ namespace MethodBasedOperations.Tests
     public class SearchMethodTests : OperationTestBase
     {
         [TestMethod]
-        public void Discover()
+        public void OD_MBO_Discover()
         {
             Reset();
 
             OperationCenter.Discover();
 
             var discovered = (Dictionary<string, OperationInfo[]>)new TypeAccessor(typeof(OperationCenter)).GetStaticField("Operations");
-            int q = 1;
+            //UNDONE: Not finished test.
         }
 
         [TestMethod]
-        public void GetMethodByRequest_Strict_1()
+        public void OD_MBO_GetMethodByRequest_Strict_1()
         {
             Reset();
 
@@ -47,7 +47,7 @@ namespace MethodBasedOperations.Tests
             Assert.AreEqual(42, context.Parameters["x"]);
         }
         [TestMethod]
-        public void GetMethodByRequest_Strict_2()
+        public void OD_MBO_GetMethodByRequest_Strict_2()
         {
             Reset();
 
@@ -69,7 +69,7 @@ namespace MethodBasedOperations.Tests
             Assert.AreEqual("42", context.Parameters["x"]);
         }
         [TestMethod]
-        public void GetMethodByRequest_Bool()
+        public void OD_MBO_GetMethodByRequest_Bool()
         {
             Reset();
 
@@ -93,7 +93,7 @@ namespace MethodBasedOperations.Tests
             Assert.AreEqual(true, context.Parameters["a"]);
         }
         [TestMethod]
-        public void GetMethodByRequest_Decimal()
+        public void OD_MBO_GetMethodByRequest_Decimal()
         {
             Reset();
 
@@ -126,7 +126,7 @@ namespace MethodBasedOperations.Tests
             Assert.AreEqual(0.123456789m, context.Parameters["a"]);
         }
         [TestMethod]
-        public void GetMethodByRequest_Float()
+        public void OD_MBO_GetMethodByRequest_Float()
         {
             Reset();
 
@@ -159,7 +159,7 @@ namespace MethodBasedOperations.Tests
             Assert.AreEqual(0.123456789f, context.Parameters["a"]);
         }
         [TestMethod]
-        public void GetMethodByRequest_Double()
+        public void OD_MBO_GetMethodByRequest_Double()
         {
             Reset();
 
@@ -193,7 +193,7 @@ namespace MethodBasedOperations.Tests
         }
 
         [TestMethod]
-        public void GetMethodByRequest_Spaceship()
+        public void OD_MBO_GetMethodByRequest_Spaceship()
         {
             Reset();
 
@@ -216,7 +216,7 @@ namespace MethodBasedOperations.Tests
             Assert.AreEqual(444, spaceship.Length);
         }
         [TestMethod]
-        public void GetMethodByRequest_Elephant()
+        public void OD_MBO_GetMethodByRequest_Elephant()
         {
             Reset();
 
@@ -239,7 +239,7 @@ namespace MethodBasedOperations.Tests
 
 
         [TestMethod]
-        public void GetMethodByRequest_NotStrict_1()
+        public void OD_MBO_GetMethodByRequest_NotStrict_1()
         {
             Reset();
 
@@ -273,7 +273,7 @@ namespace MethodBasedOperations.Tests
         }
         [TestMethod]
         [ExpectedException(typeof(OperationNotFoundException))]
-        public void GetMethodByRequest_NotFound_ByName()
+        public void OD_MBO_GetMethodByRequest_NotFound_ByName()
         {
             Reset();
 
@@ -284,7 +284,7 @@ namespace MethodBasedOperations.Tests
         }
         [TestMethod]
         [ExpectedException(typeof(OperationNotFoundException))]
-        public void GetMethodByRequest_NotFound_ByRequiredParamName()
+        public void OD_MBO_GetMethodByRequest_NotFound_ByRequiredParamName()
         {
             Reset();
 
@@ -295,7 +295,7 @@ namespace MethodBasedOperations.Tests
         }
         [TestMethod]
         [ExpectedException(typeof(OperationNotFoundException))]
-        public void GetMethodByRequest_NotFound_ByRequiredParamType()
+        public void OD_MBO_GetMethodByRequest_NotFound_ByRequiredParamType()
         {
             Reset();
 
@@ -306,7 +306,7 @@ namespace MethodBasedOperations.Tests
         }
         [TestMethod]
         [ExpectedException(typeof(AmbiguousMatchException))]
-        public void GetMethodByRequest_AmbiguousMatch()
+        public void OD_MBO_GetMethodByRequest_AmbiguousMatch()
         {
             Reset();
 
@@ -322,7 +322,7 @@ namespace MethodBasedOperations.Tests
         }
         [TestMethod]
         [ExpectedException(typeof(OperationNotFoundException))]
-        public void GetMethodByRequest_UnmatchedOptional()
+        public void OD_MBO_GetMethodByRequest_UnmatchedOptional()
         {
             Reset();
 

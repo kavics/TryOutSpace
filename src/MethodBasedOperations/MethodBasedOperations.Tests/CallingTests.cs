@@ -10,7 +10,7 @@ namespace MethodBasedOperations.Tests
     public class CallingTests : OperationTestBase
     {
         [TestMethod]
-        public void Call_RequiredPrimitives()
+        public void OD_MBO_Call_RequiredPrimitives()
         {
             Reset();
 
@@ -36,7 +36,7 @@ namespace MethodBasedOperations.Tests
         }
 
         [TestMethod]
-        public void Call_OptionalPrimitives()
+        public void OD_MBO_Call_OptionalPrimitives()
         {
             Reset();
 
@@ -153,7 +153,7 @@ namespace MethodBasedOperations.Tests
         }
 
         [TestMethod]
-        public void Call_MinimalParameters()
+        public void OD_MBO_Call_MinimalParameters()
         {
             Reset();
 
@@ -171,7 +171,7 @@ namespace MethodBasedOperations.Tests
         }
 
         [TestMethod]
-        public void Call_NullAndDefault()
+        public void OD_MBO_Call_NullAndDefault()
         {
             Reset();
 
@@ -196,7 +196,7 @@ namespace MethodBasedOperations.Tests
             Assert.AreEqual(0.0d, objects[5]);
         }
         [TestMethod]
-        public void Call_UndefinedAndDefault()
+        public void OD_MBO_Call_UndefinedAndDefault()
         {
             Reset();
 
@@ -222,7 +222,7 @@ namespace MethodBasedOperations.Tests
         }
 
         [TestMethod]
-        public void Call_Inspection()
+        public void OD_MBO_Call_Inspection()
         {
             Reset();
 
